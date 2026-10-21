@@ -79,3 +79,23 @@ C17,dots-studio/dots-3-note-preview:free,traces-E2.csv,openrouter:dots-studio/do
 C18,dots-studio/dots-3-note-preview:free,traces-E2.csv,openrouter:dots-studio/dots-3-note-preview:free:C18,real,OK,39580,62480,"Wrong value (under-count): age at order is tested as year difference = 25 with the birthday already passed, but customers whose year difference is 26 and whose birthday has not yet come are also exactly 25; they are missing."
 C19,dots-studio/dots-3-note-preview:free,traces-E2.csv,openrouter:dots-studio/dots-3-note-preview:free:C19,real,OK,1990,1990,correct
 C20,dots-studio/dots-3-note-preview:free,traces-E2.csv,openrouter:dots-studio/dots-3-note-preview:free:C20,real,OK,1106090,1106090,correct
+C01,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C01,real,OK,792800,792800,correct
+C02,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C02,real,OK,590320,590320,correct
+C03,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C03,real,OK,936350,936350,correct
+C04,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C04,real,OK,2826250,2826250,correct
+C05,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C05,real,OK,38480,38480,correct
+C06,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C06,real,OK,0,0,correct
+C07,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C07,real,OK,13970,13970,correct
+C08,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C08,real,OK,605580,605580,correct
+C09,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C09,real,OK,0,487980,"Wrong value (0): the two month-day conditions contradict each other (>= the birth month-day and < the month-day of birth_date + 26 years, which is the same month-day), so no row is kept; the query also ignores the reference date 2026-09-26 and tests the age at order time."
+C10,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C10,real,OK,119410,558980,"Wrong value (under-count): the first condition keeps only orders placed on or after the birthday in the year of the 25th birthday, so orders placed before the 26th birthday in the following year (year difference 26, earlier month-day) are dropped."
+C11,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C11,real,OK,446690,446690,correct
+C12,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C12,real,OK,1666490,1666490,correct
+C13,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C13,real,OK,107740,107740,correct
+C14,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C14,real,OK,0,0,correct
+C15,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C15,real,OK,0,168680,"Wrong value (0): the birthday test requires the birth month-day to be <= 09-25 and > 09-25 at the same time (the 2025 date has the same month-day), so it is never true; the birth year is not tested at all."
+C16,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C16,real,OK,367050,376740,"Wrong value (under-count): the birth-date window is off by one day on 09-25: it keeps customers born on 2000-09-25 (already 26) and drops those born on 2001-09-25 (exactly 25)."
+C17,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C17,real,OK,248490,258180,"Wrong value (under-count): the birth-date window is off by one day on 09-25: it keeps customers born on 2000-09-25 (already 26) and drops those born on 2001-09-25 (exactly 25)."
+C18,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C18,real,OK,62480,62480,correct
+C19,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C19,real,OK,83580,1990,"Wrong value (over-count): the age test compares a 4-digit year string with the full date 2026-09-25, which is always true as a text comparison, so almost every customer is kept instead of only the 25-year-olds."
+C20,qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C20,real,OK,1106090,1106090,correct
