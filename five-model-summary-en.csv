@@ -1,6 +1,6 @@
 provider,model_id,public_index,index_date,index_source,paid_route_same_model,input_usd_per_million,output_usd_per_million,price_date,price_source,access_used,period_results,age_results,product_results,combined_results,trace_files,limits
 groq,openai/gpt-oss-120b,11.6,2026-09-28,portefeuille-modeles-2026-09-28.csv,openrouter,0.15,0.6,2026-09-28,portefeuille-modeles-2026-09-28.csv,gratuit,6/6,5/5,4/4,5/5,traces-A.csv;state-A.jsonl,none
-groq,openai/gpt-oss-20b,,,,,,,,,,,,,,,
+groq,openai/gpt-oss-20b,9,2026-09-28,portefeuille-modeles-2026-09-28.csv,groq (paid tier),0.075,0.3,2026-10-21,groq.com/pricing,gratuit,6/6,3/5,4/4,5/5,traces-B.csv;state-B.jsonl,HTTP 429 TPM limit (8000) on C19 - 1 retry OK
 openrouter,inclusionai/ling-3.0-flash-sante:free,,,,,,,,,,,,,,,
 groq,qwen/qwen3.8-27b,,,,,,,,,,,,,,,
 openrouter,dots-studio/dots-3-note-preview:free,,,,,,,,,,,,,,,
