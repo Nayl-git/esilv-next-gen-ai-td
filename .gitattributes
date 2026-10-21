@@ -1,0 +1,3 @@
+# Keep every file byte-for-byte: data/manifest.json checks SHA-256 hashes
+# of the CSV files and schema.sql, so no line-ending conversion on checkout.
+* -text
