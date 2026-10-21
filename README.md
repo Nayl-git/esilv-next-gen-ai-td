@@ -6,6 +6,14 @@ Kit of 14 October 2026 for the three sessions of 21 October, 18 November and
 11 December. The database and the twenty questions are the same for every
 sub-group. Read the environment guide first and finish preparation by 18 October inclusive; each assignment gives the schedule of its afternoon.
 
+## Sub-group DIA2-1
+
+This repository is the shared repository of sub-group **DIA2-1** for TD 1 to TD 3.
+
+| Session | Report | Results |
+|---|---|---|
+| TD 1, 21 October 2026 | [reports/td1.md](reports/td1.md) | [reference-td1.csv](reference-td1.csv), [traces-td1.csv](traces-td1.csv), [model-question-comparison-en.csv](model-question-comparison-en.csv), [five-model-summary-en.csv](five-model-summary-en.csv) |
+
 ## Before the first session
 
 | File | Role |
