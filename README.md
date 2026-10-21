@@ -1,4 +1,4 @@
-# Lab kit, Trustworthy generative AI, ESILV
+# Lab kit, Trustworthy generative AI, ESILV DIA2-1
 
 > Final. Pack 2026-10-14-students-1. Set your machine up with [Before TD 1](../before-td1-en.html).
 
