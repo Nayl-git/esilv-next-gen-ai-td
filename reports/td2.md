@@ -6,7 +6,7 @@ No new network batch: every result below comes from the stored TD 1 traces ([tra
 
 ## Summary
 
-- **Step 1 (Pair A):** `Orchestrateur.vote_k_sur_n` is implemented in [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py) (commit f399f1a). *To complete by Pair A: the table of the twenty decisions.*
+- **Step 1 (Pair A):** `Orchestrateur.vote_k_sur_n` is implemented in [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py) (commit f399f1a). The table of the twenty decisions is in the Step 1 section: 15 correct consensus, 5 abstentions, 0 wrong for the fixed 2-of-3 panel; 16 / 4 / 0 for 3-of-5.
 - **Step 2 (Pair B):** one real wrong consensus in our batch, **C09**: `qwen3.8-27b` and `dots-3-note` both return **0** cents for a reference of **487 980**, through two different SQL errors. The fixed 2-of-3 panel **abstains** on C09; a panel {gpt-oss, qwen, dots} would accept 0. The delta query lists the six customers the two faulty queries miss; their revenue sums to the whole gap, 487 980 cents. A population check rejects a 0 when the targeted population is not empty: computed without any model for the age-at-a-date questions, it flags the wrong zeros of C02, C09 and C11; for C10, C15 and C16 the population still comes from the reference query, so the check is not yet model-free there.
 - **Step 3 (Pair C):** the routing simulator is adapted to our five TD 1 models ([atelier-routage.py](../atelier-routage.py)), outputs before and after in [routage-avant.jsonl](../routage-avant.jsonl) and [routage-apres.jsonl](../routage-apres.jsonl). The rule gives, for each question family, a first model, a check by use and a fallback, and declares the quorum panel {gpt-oss-120b, gpt-oss-20b, qwen3.8-27b}. **The results of the first version differ from the final ones because of the cross-review by Pair B**: the panel was not declared and a panel holding qwen3.8-27b and dots-3-note accepts the wrong 0 of C09; see "Effect of the cross-review on the results".
 
@@ -15,7 +15,7 @@ No new network batch: every result below comes from the stored TD 1 traces ([tra
 | Step | Pair | Status | Evidence |
 |---|---|---|---|
 | Step 1: `vote_k_sur_n` | A | implemented; synthetic tests pass (see below) | [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py), `python atelier-vote.py` |
-| Step 1: table of the twenty decisions | A | *to complete by Pair A* | |
+| Step 1: table of the twenty decisions | A | done | Step 1 section below, `python tableau-vote.py` |
 | Step 2: wrong consensus, cause, quorum, check | B | done | [td2/wrong-consensus-C09.md](../td2/wrong-consensus-C09.md), [td2/wrong_consensus.py](../td2/wrong_consensus.py), [td2/pair-b-outputs/](../td2/pair-b-outputs/) |
 | Step 3: simulator before / after | C | done | [routage-avant.jsonl](../routage-avant.jsonl), [routage-apres.jsonl](../routage-apres.jsonl) |
 | Step 3: one-page routing rule | C | done, revised after the cross-review of Pair B | Step 3 section below, [td2/draft-pair-C-section.md](../td2/draft-pair-C-section.md) |
@@ -34,7 +34,48 @@ Synthetic tests (`python atelier-vote.py`, nature `simulation`, not shop data):
 | unavailable | 100, error, error | abstention, 1 vote: the unavailable members stay in n |
 | wrong consensus | 0, 0, 100 | consensus 0, 2 votes; reference 100, so wrong |
 
-*To complete by Pair A: the duplicate-route test, and the table of the twenty decisions (consensus or abstention, value, votes, agreement with the reference) from `python atelier-vote.py --traces traces-td1.csv --case Cxx`.*
+Duplicate-route test (nature `simulation`, not shop data; run on `Orchestrateur.vote_k_sur_n` of the skeleton):
+
+| Proposals | k | Result |
+|---|---|---|
+| `groq:x` 100, `groq:x` 100, `openrouter:y` 5 | 2 | `ValueError`: duplicate proposal from groq:x, a duplicate is not a second vote |
+| `groq:x` 100, `groq:x` error, `openrouter:y` 5 | 2 | same `ValueError`: the duplicate is refused even when one copy is an error |
+| 1, 1, 1 from three distinct members | 1 | `ValueError`: k=1 is not a strict majority of n=3 |
+
+### The twenty decisions
+
+Produced by `python tableau-vote.py` (stored TD 1 traces, last attempt of each model per question, no network; the reference is compared after the decision). 2-of-3 is the fixed panel {gpt-oss-120b, north-mini-code, qwen3.8-27b}; 3-of-5 adds gpt-oss-20b and dots-3-note. Same table in [td2-table.md](td2-table.md).
+
+| Question | Reference | 2-of-3 (k = 2) | 3-of-5 (k = 3) | Decision changes? |
+|---|---|---|---|---|
+| C01 | 792800 | 792800 (3 votes) correct | 792800 (5 votes) correct | no |
+| C02 | 590320 | 590320 (2 votes) correct | 590320 (3 votes) correct | no |
+| C03 | 936350 | 936350 (3 votes) correct | 936350 (5 votes) correct | no |
+| C04 | 2826250 | 2826250 (3 votes) correct | 2826250 (5 votes) correct | no |
+| C05 | 38480 | 38480 (3 votes) correct | 38480 (5 votes) correct | no |
+| C06 | 0 | 0 (3 votes) correct | 0 (5 votes) correct | no |
+| C07 | 13970 | 13970 (3 votes) correct | 13970 (5 votes) correct | no |
+| C08 | 605580 | 605580 (2 votes) correct | 605580 (3 votes) correct | no |
+| C09 | 487980 | abstention (max 1 vote) | abstention (max 2 votes) | no |
+| C10 | 558980 | abstention (max 1 vote) | abstention (max 2 votes) | no |
+| C11 | 446690 | 446690 (2 votes) correct | 446690 (3 votes) correct | no |
+| C12 | 1666490 | 1666490 (3 votes) correct | 1666490 (5 votes) correct | no |
+| C13 | 107740 | 107740 (3 votes) correct | 107740 (5 votes) correct | no |
+| C14 | 0 | 0 (3 votes) correct | 0 (5 votes) correct | no |
+| C15 | 168680 | 168680 (2 votes) correct | 168680 (4 votes) correct | no |
+| C16 | 376740 | abstention (max 1 vote) | abstention (max 2 votes) | no |
+| C17 | 258180 | abstention (max 1 vote) | abstention (max 2 votes) | no |
+| C18 | 62480 | 62480 (2 votes) correct | 62480 (3 votes) correct | no |
+| C19 | 1990 | abstention (max 1 vote) | 1990 (3 votes) correct | yes |
+| C20 | 1106090 | 1106090 (3 votes) correct | 1106090 (5 votes) correct | no |
+
+Totals: 2-of-3 gives 15 correct consensus, 5 abstentions (C09, C10, C16, C17, C19) and 0 wrong consensus; 3-of-5 gives 16 correct, 4 abstentions and 0 wrong. Only C19 changes.
+
+**C19, the only change (reference 1 990).** gpt-oss-120b, gpt-oss-20b and dots-3-note return 1 990 (correct); north-mini-code returns 71 640 and qwen3.8-27b 83 580 (both incorrect). The fixed panel holds only one of the three correct models, so 1 990 gets 1 vote out of the 2 required and it abstains. The 3-of-5 quorum holds all three, reaches 3 votes out of 3 required, and decides correctly. This consensus depends on retries: gpt-oss-20b and qwen3.8-27b both received HTTP 429 on their first attempt (attempts 1 in [traces-td1.csv](../traces-td1.csv)) and answered on the second; without the gpt-oss-20b retry, 1 990 would have 2 votes out of 3 required. Here the larger quorum helps, but only because three of the five models happened to be right; it is a count on one question, not a rule.
+
+**Thin margins.** C02, C08, C11 and C18 pass the 2-of-3 panel with 2 votes only: north-mini-code returns a wrong figure (C02 2 606 320, C11 0, C18 286 650) or invalid SQL (C08). The decision does not change, but one more failure among the two other members would have made the panel abstain. Under 3-of-5 the same four questions get 3 votes, exactly k.
+
+**Pair A response to the cross-reviews of Pairs B and C.** The table, in English, the C19 comment and the duplicate test are now in this section; the Step 1 "to complete" notes are closed. Not changed: `tableau-vote.py` still keeps the last row in file order (right for this file; both reviewers flagged it as minor).
 
 ## Step 2: the wrong consensus (Pair B)
 
@@ -339,8 +380,9 @@ Pair A reviewed Steps 2 and 3 by reading the documents, without re-running them;
 
 | GitHub account | Pair | Contribution |
 |---|---|---|
-| ambrere | A | `vote_k_sur_n` (commit f399f1a) |
-| *to complete* | A | |
+| ambrere | A | `vote_k_sur_n` (commit f399f1a); `tableau-vote.py` and the 2-of-3 vs 3-of-5 table; the Step 1 section of this report (table in English, comment on C19, duplicate-route test) |
+| AmandineBaranger | A | TD 1: run of gpt-oss-120b on the twenty questions and its summary files (commits 1ad5688, 59358b7, bb8ccae). TD 2 share: *to be confirmed by this member* |
+| FeliciaEsilv | A | TD 1: SQL queries for C03 and C04 (commit b16a075). TD 2 share: *to be confirmed by this member* |
 | enkimlt | B | Step 2, shared equally with nohamsantenac and PierreBOUDRAA (see note below) |
 | nohamsantenac | B | Step 2, shared equally with enkimlt and PierreBOUDRAA (see note below) |
 | PierreBOUDRAA | B | Step 2, shared equally with enkimlt and nohamsantenac (see note below) |
