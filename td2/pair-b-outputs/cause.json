@@ -1,0 +1,65 @@
+{
+ "section": "cause",
+ "case": "C09",
+ "nature": "real (TD 1 SQL replayed read-only on boutique.sqlite)",
+ "reference": {
+  "where": "(CAST(strftime('%Y','2026-09-26') AS INTEGER) - CAST(strftime('%Y',c.birth_date) AS INTEGER) - (strftime('%m-%d','2026-09-26') < strftime('%m-%d',c.birth_date))) = 25",
+  "order_lines": 68,
+  "customers": 6,
+  "revenue_cents": 487980
+ },
+ "qwen3.8-27b": [
+  {
+   "cumulative": "Q1 (o.date year - birth year) = 25",
+   "order_lines": 72,
+   "customers": 7,
+   "ref_lines_kept": 50
+  },
+  {
+   "cumulative": "Q2 order month-day >= birth month-day",
+   "order_lines": 14,
+   "customers": 2,
+   "ref_lines_kept": 14
+  },
+  {
+   "cumulative": "Q3 order month-day < month-day of birth_date + 26 years",
+   "order_lines": 0,
+   "customers": 0,
+   "ref_lines_kept": 0
+  }
+ ],
+ "dots-3-note": [
+  {
+   "cumulative": "D1 birth year + 25 = 2026",
+   "order_lines": 72,
+   "customers": 7,
+   "ref_lines_kept": 50
+  },
+  {
+   "cumulative": "D2 birth month-day = 09-26",
+   "order_lines": 6,
+   "customers": 1,
+   "ref_lines_kept": 6
+  },
+  {
+   "cumulative": "D3 order placed on 2026-09-26",
+   "order_lines": 0,
+   "customers": 0,
+   "ref_lines_kept": 0
+  }
+ ],
+ "qwen_proof": {
+  "customers_where_md(birth+26y) != md(birth)": 0,
+  "order_lines_where_Q2_and_Q3": 0
+ },
+ "dots_proof": {
+  "customers_born_2001-09-26": 1,
+  "orders_on_2026-09-26": 0,
+  "max_order_date": "2026-09-20 19:24:25"
+ },
+ "delta_reference_minus_wrong": {
+  "sql": "SELECT o.rowid FROM orders o JOIN customers c ON ... WHERE <reference> EXCEPT SELECT o.rowid ... WHERE <wrong>",
+  "qwen_missing_lines": 68,
+  "dots_missing_lines": 68
+ }
+}

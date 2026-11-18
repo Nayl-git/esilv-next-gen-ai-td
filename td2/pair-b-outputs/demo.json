@@ -1,0 +1,30 @@
+{
+ "section": "demo",
+ "case": "DEMO-VOTE",
+ "nature": "synthetic (supplied teaching example, not model output, not shop data)",
+ "toy_table": [
+  [
+   "2026-01-01",
+   100
+  ]
+ ],
+ "period": "[2026-01-01, 2026-01-02)",
+ "strict_variant": {
+  "sql": "SELECT COALESCE(SUM(amount_cents), 0) FROM sales WHERE sale_date > '2026-01-01' AND sale_date < '2026-01-02'",
+  "value": 0
+ },
+ "inclusive_variant": {
+  "sql": "SELECT COALESCE(SUM(amount_cents), 0) FROM sales WHERE sale_date >= '2026-01-01' AND sale_date < '2026-01-02'",
+  "value": 100
+ },
+ "decision_2_of_3": {
+  "consensus": true,
+  "value": 0,
+  "votes": 2,
+  "models": [
+   "demo:A",
+   "demo:B"
+  ]
+ },
+ "reference": 100
+}

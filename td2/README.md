@@ -9,7 +9,7 @@ No new batch of network calls: everything runs on the stored TD 1 traces ([trace
 | Pair | Step | Status | Files |
 |---|---|---|---|
 | A | Step 1: `Orchestrateur.vote_k_sur_n`, then the 2-of-3 vs 3-of-5 table on the twenty questions | to update by Pair A | [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py) |
-| B | Step 2: a verified wrong consensus, with SQL root cause and delta query | to update by Pair B | |
+| B | Step 2: a verified wrong consensus, with SQL root cause and delta query | done: C09, qwen3.8-27b and dots-3-note both return 0 (ref 487 980); fixed 2-of-3 panel abstains; population check flags it | [wrong-consensus-C09.md](wrong-consensus-C09.md), [wrong_consensus.py](wrong_consensus.py), [pair-b-outputs/](pair-b-outputs/) |
 | C | Step 3: routing rule per question family, simulator before and after, priority analysis | simulator adapted and committed; one-page rule and priority analysis to write in the report | [atelier-routage.py](../atelier-routage.py), [routage-avant.jsonl](../routage-avant.jsonl), [routage-apres.jsonl](../routage-apres.jsonl) |
 
 Each pair keeps its own row up to date when it pushes. Pull before editing this file.
@@ -24,6 +24,17 @@ Each pair keeps its own row up to date when it pushes. Pull before editing this 
 ```
 python atelier-routage.py                        # the nine scenarios
 python atelier-routage.py --scenario deferrable  # one scenario
+```
+
+## Pair B: wrong consensus
+
+- Real case **C09** (F2, age at a date): `groq:qwen/qwen3.8-27b` and `openrouter:dots-studio/dots-3-note-preview:free` both return 0 cents for a reference of 487 980, through two different SQL errors that both empty the filter.
+- The fixed 2-of-3 panel and the 3-of-5 quorum **abstain** on C09; a panel {gpt-oss, qwen, dots} gives a **wrong consensus** on 0.
+- Independent check: a model-free population count. A 0 is rejected when the targeted population is not empty: it flags every wrong 0 of the batch and no true zero (C06, C14).
+- Synthetic case DEMO-VOTE executed on its toy table, labelled synthetic.
+
+```
+python td2/wrong_consensus.py                   # scan, quorum, panels, cause, check, demo
 ```
 
 ## Commands of the other steps

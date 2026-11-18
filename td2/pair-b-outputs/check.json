@@ -1,0 +1,191 @@
+{
+ "section": "check",
+ "nature": "real (read-only on boutique.sqlite)",
+ "rows": [
+  {
+   "case": "C01",
+   "reference": 792800,
+   "reference_population_lines": 115,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C02",
+   "reference": 590320,
+   "reference_population_lines": 82,
+   "independent_window_lines": 82,
+   "models_returning_0": [
+    "openai/gpt-oss-20b"
+   ],
+   "zero_flagged": true
+  },
+  {
+   "case": "C03",
+   "reference": 936350,
+   "reference_population_lines": 145,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C04",
+   "reference": 2826250,
+   "reference_population_lines": 397,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C05",
+   "reference": 38480,
+   "reference_population_lines": 5,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C06",
+   "reference": 0,
+   "reference_population_lines": 0,
+   "independent_window_lines": null,
+   "models_returning_0": [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "cohere/north-mini-code:free",
+    "qwen/qwen3.8-27b",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "zero_flagged": false
+  },
+  {
+   "case": "C07",
+   "reference": 13970,
+   "reference_population_lines": 2,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C08",
+   "reference": 605580,
+   "reference_population_lines": 81,
+   "independent_window_lines": 81,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C09",
+   "reference": 487980,
+   "reference_population_lines": 68,
+   "independent_window_lines": 68,
+   "models_returning_0": [
+    "qwen/qwen3.8-27b",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "zero_flagged": true
+  },
+  {
+   "case": "C10",
+   "reference": 558980,
+   "reference_population_lines": 73,
+   "independent_window_lines": null,
+   "models_returning_0": [
+    "cohere/north-mini-code:free"
+   ],
+   "zero_flagged": true
+  },
+  {
+   "case": "C11",
+   "reference": 446690,
+   "reference_population_lines": 60,
+   "independent_window_lines": 60,
+   "models_returning_0": [
+    "cohere/north-mini-code:free"
+   ],
+   "zero_flagged": true
+  },
+  {
+   "case": "C12",
+   "reference": 1666490,
+   "reference_population_lines": 245,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C13",
+   "reference": 107740,
+   "reference_population_lines": 14,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C14",
+   "reference": 0,
+   "reference_population_lines": 0,
+   "independent_window_lines": null,
+   "models_returning_0": [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "cohere/north-mini-code:free",
+    "qwen/qwen3.8-27b",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "zero_flagged": false
+  },
+  {
+   "case": "C15",
+   "reference": 168680,
+   "reference_population_lines": 27,
+   "independent_window_lines": null,
+   "models_returning_0": [
+    "qwen/qwen3.8-27b"
+   ],
+   "zero_flagged": true
+  },
+  {
+   "case": "C16",
+   "reference": 376740,
+   "reference_population_lines": 55,
+   "independent_window_lines": null,
+   "models_returning_0": [
+    "cohere/north-mini-code:free"
+   ],
+   "zero_flagged": true
+  },
+  {
+   "case": "C17",
+   "reference": 258180,
+   "reference_population_lines": 40,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C18",
+   "reference": 62480,
+   "reference_population_lines": 8,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C19",
+   "reference": 1990,
+   "reference_population_lines": 1,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  },
+  {
+   "case": "C20",
+   "reference": 1106090,
+   "reference_population_lines": 158,
+   "independent_window_lines": null,
+   "models_returning_0": [],
+   "zero_flagged": false
+  }
+ ]
+}

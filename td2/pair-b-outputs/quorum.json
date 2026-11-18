@@ -1,0 +1,66 @@
+{
+ "section": "quorum",
+ "case": "C09",
+ "nature": "real (TD 1 traces), vote decided before the reference is read",
+ "results": [
+  {
+   "quorum": "fixed panel 2-of-3 (atelier-vote.py)",
+   "k": 2,
+   "n": 3,
+   "proposals": {
+    "groq:openai/gpt-oss-120b": 487980,
+    "openrouter:cohere/north-mini-code:free": "sql_invalid",
+    "groq:qwen/qwen3.8-27b": 0
+   },
+   "decision": {
+    "consensus": false,
+    "value": null,
+    "votes": 1,
+    "models": []
+   },
+   "reference": 487980,
+   "outcome": "abstention"
+  },
+  {
+   "quorum": "all five TD 1 models, 3-of-5",
+   "k": 3,
+   "n": 5,
+   "proposals": {
+    "groq:openai/gpt-oss-120b": 487980,
+    "groq:openai/gpt-oss-20b": 487980,
+    "openrouter:cohere/north-mini-code:free": "sql_invalid",
+    "groq:qwen/qwen3.8-27b": 0,
+    "openrouter:dots-studio/dots-3-note-preview:free": 0
+   },
+   "decision": {
+    "consensus": false,
+    "value": null,
+    "votes": 2,
+    "models": []
+   },
+   "reference": 487980,
+   "outcome": "abstention"
+  },
+  {
+   "quorum": "counter-example panel 2-of-3 {gpt-oss-120b, qwen, dots}",
+   "k": 2,
+   "n": 3,
+   "proposals": {
+    "groq:openai/gpt-oss-120b": 487980,
+    "groq:qwen/qwen3.8-27b": 0,
+    "openrouter:dots-studio/dots-3-note-preview:free": 0
+   },
+   "decision": {
+    "consensus": true,
+    "value": 0,
+    "votes": 2,
+    "models": [
+     "groq:qwen/qwen3.8-27b",
+     "openrouter:dots-studio/dots-3-note-preview:free"
+    ]
+   },
+   "reference": 487980,
+   "outcome": "WRONG CONSENSUS"
+  }
+ ]
+}

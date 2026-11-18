@@ -1,0 +1,89 @@
+{
+ "section": "panels",
+ "nature": "real (TD 1 traces), 2-of-3, distinct families only",
+ "panels": [
+  {
+   "panel": [
+    "openai/gpt-oss-120b",
+    "cohere/north-mini-code:free",
+    "qwen/qwen3.8-27b"
+   ],
+   "correct": 15,
+   "abstain": 5,
+   "wrong_consensus": 0,
+   "wrong_cases": []
+  },
+  {
+   "panel": [
+    "openai/gpt-oss-120b",
+    "cohere/north-mini-code:free",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "correct": 14,
+   "abstain": 6,
+   "wrong_consensus": 0,
+   "wrong_cases": []
+  },
+  {
+   "panel": [
+    "openai/gpt-oss-120b",
+    "qwen/qwen3.8-27b",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "correct": 16,
+   "abstain": 3,
+   "wrong_consensus": 1,
+   "wrong_cases": [
+    "C09=0"
+   ]
+  },
+  {
+   "panel": [
+    "openai/gpt-oss-20b",
+    "cohere/north-mini-code:free",
+    "qwen/qwen3.8-27b"
+   ],
+   "correct": 13,
+   "abstain": 7,
+   "wrong_consensus": 0,
+   "wrong_cases": []
+  },
+  {
+   "panel": [
+    "openai/gpt-oss-20b",
+    "cohere/north-mini-code:free",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "correct": 12,
+   "abstain": 8,
+   "wrong_consensus": 0,
+   "wrong_cases": []
+  },
+  {
+   "panel": [
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.8-27b",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "correct": 16,
+   "abstain": 3,
+   "wrong_consensus": 1,
+   "wrong_cases": [
+    "C09=0"
+   ]
+  },
+  {
+   "panel": [
+    "cohere/north-mini-code:free",
+    "qwen/qwen3.8-27b",
+    "dots-studio/dots-3-note-preview:free"
+   ],
+   "correct": 13,
+   "abstain": 6,
+   "wrong_consensus": 1,
+   "wrong_cases": [
+    "C09=0"
+   ]
+  }
+ ]
+}

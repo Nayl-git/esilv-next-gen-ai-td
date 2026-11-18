@@ -1,0 +1,20 @@
+{
+ "section": "scan",
+ "nature": "real (TD 1 traces)",
+ "wrong_consensus_cases": [
+  {
+   "case": "C09",
+   "wrong_value": 0,
+   "reference": 487980,
+   "agreeing": 2,
+   "models": [
+    "groq:qwen/qwen3.8-27b",
+    "openrouter:dots-studio/dots-3-note-preview:free"
+   ],
+   "cells": [
+    "groq:qwen/qwen3.8-27b:C09",
+    "openrouter:dots-studio/dots-3-note-preview:free:C09"
+   ]
+  }
+ ]
+}
