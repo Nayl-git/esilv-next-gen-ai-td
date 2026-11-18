@@ -624,7 +624,38 @@ class Orchestrateur:
         families, and look in your traces for a case where several models agree
         on a wrong value.
         """
-        raise NotImplementedError("vote_k_sur_n: to implement in TD 2 (see the procedure in the docstring).")
+        n = len(traces_question)
+
+        # Rule 2: k must be a strict majority of n (n // 2 < k <= n).
+        if not (n // 2 < k <= n):
+            raise ValueError(f"k={k} is not a strict majority of n={n}: need {n // 2} < k <= {n}")
+
+        # Rule 3: a duplicate (provider, model) is not a second vote. Checked on
+        # every proposal, including errors, so n always counts distinct members.
+        seen = set()
+        for proposal in traces_question:
+            member = (proposal.provider, proposal.model_requested)
+            if member in seen:
+                raise ValueError(f"duplicate proposal from {member[0]}:{member[1]}: a duplicate is not a second vote")
+            seen.add(member)
+
+        # Rule 1: only executed proposals carrying a value vote. Errors and
+        # unavailable members stay in n (through the k check above) but cast no vote.
+        ballots: dict = {}
+        for proposal in traces_question:
+            if proposal.verdict == "executed" and proposal.value is not None:
+                ballots.setdefault(proposal.value, []).append(f"{proposal.provider}:{proposal.model_requested}")
+
+        top_votes = max((len(models) for models in ballots.values()), default=0)
+
+        # Rule 4: a value that reaches k votes wins. Since k > n / 2, at most one
+        # value can reach k, so the choice is unambiguous.
+        for value, models in ballots.items():
+            if len(models) >= k:
+                return {"consensus": True, "value": value, "votes": len(models), "models": models}
+
+        # Rule 5: no value reaches k: abstain, never invent a value.
+        return {"consensus": False, "value": None, "votes": top_votes, "models": []}
 
 
 # ==========================================================================
