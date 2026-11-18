@@ -273,7 +273,7 @@ Pair A read Steps 2 and 3 without running anything (`peer-review-pair-A-section.
 | Groq limits | "1 000 output tokens per minute" and "8 000 tokens per minute" without saying that they are two limits | two limits, each with its source |
 | Scenario "high impact" in [routage-apres.jsonl](../routage-apres.jsonl) | check "reference check or human review" | check "3-of-5 quorum, then deterministic recomputation, then human review" |
 
-The actions of the simulator did not change. The recomputation that the table above calls "implemented for F2 only" was then written for the five families ([td2/recompute.py](../td2/recompute.py)). The panel of two gpt-oss models is discussed in "Coverage versus independence", and the contributions of the trio are still to complete.
+The actions of the simulator did not change. The recomputation that the table above calls "implemented for F2 only" was then written for the five families ([td2/recompute.py](../td2/recompute.py)). The panel of two gpt-oss models is discussed in "Coverage versus independence", and the contributions of the trio are in the Contributions section.
 
 ### Priority analysis: included capacity before deferring
 
