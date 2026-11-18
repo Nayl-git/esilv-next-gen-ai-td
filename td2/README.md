@@ -24,7 +24,11 @@ Each pair keeps its own row up to date when it pushes. Pull before editing this 
 ```
 python atelier-routage.py                        # the nine scenarios
 python atelier-routage.py --scenario deferrable  # one scenario
+python td2/rates_by_family.py                    # TD 1 rates by question family (--failures for the failing cells)
+python td2/panels.py                             # the ten 2-of-3 panels on the TD 1 traces
 ```
+
+`rates_by_family.py` and `panels.py` read `traces-td1.csv` and `reference-td1.csv`, offline, standard library only. The reference is read only after each decision.
 
 ## Pair B: wrong consensus
 

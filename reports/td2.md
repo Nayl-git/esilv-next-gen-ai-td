@@ -99,7 +99,7 @@ Each question goes to the cheapest model that is still reliable enough for its f
 
 ### TD 1 rates by family
 
-Final result of each cell (last attempt), `correct / cases`. The five families partition the twenty questions.
+Final result of each cell (last attempt), `correct / cases`. The five families partition the twenty questions. Reproduce with `python td2/rates_by_family.py` (add `--failures` for the failing cells).
 
 | Family | Questions | gpt-oss-120b | gpt-oss-20b | qwen3.8-27b | dots-3-note | north-mini-code |
 |---|---|---|---|---|---|---|
@@ -140,7 +140,7 @@ Consistency with the constraint of the assignment:
 
 ### 2-of-3 panels evaluated on the TD 1 traces
 
-Each panel was evaluated with k = 2 on the twenty questions (the final result of each cell, compared with the reference only after the decision):
+Each panel was evaluated with k = 2 on the twenty questions (the final result of each cell, compared with the reference only after the decision). Reproduce with `python td2/panels.py`; it lists all ten panels of three models, and the table below shows seven of them. `--panel PROVIDER:MODEL PROVIDER:MODEL PROVIDER:MODEL` evaluates one panel.
 
 | Panel | Correct consensus | Abstentions | Wrong consensus | Questions not correct |
 |---|---|---|---|---|
