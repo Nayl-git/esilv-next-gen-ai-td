@@ -120,6 +120,7 @@ In our adapted rule the same order applies to the paid route. In the "deferrable
 
 - Small samples: four to six questions per family, and a single question for F2b. The rates are a routing hypothesis for this batch, not a ranking of the models.
 - Panel P was selected on the same twenty questions it is evaluated on; its 20/20 is not a guarantee on new questions. It holds two models of the same family, so their errors may be correlated.
+- The zero check is model-free only for F2 (C02, C08, C09, C11). For F2b (C10) and for the combinations, the population still comes from the reference query, which a live service does not have: on F2b the zero check is a requirement, not an implemented control (see the cross-review by Pair C of Step 2).
 - Variability: temperature 0 does not guarantee identical answers on a new run. The inconsistency of gpt-oss-20b between F2 (2/4) and F4 (5/5) is probably such variability, which is why F4 keeps a quorum.
 - Prices come from two sources and two dates (portfolio of 2026-09-28, Groq pages of 2026-10-21). dots-3-note and north-mini-code have no documented paid route.
 - The token envelope (1 000 input, 300 output) is an assumption; the TD 1 traces show about 600 input and 150 to 260 output tokens on average.

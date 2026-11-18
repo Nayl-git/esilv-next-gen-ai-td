@@ -211,6 +211,7 @@ In our adapted rule the same order applies to the paid route. In the "deferrable
 
 - Small samples: four to six questions per family, and a single question for F2b. The rates are a routing hypothesis for this batch, not a ranking of the models.
 - Panel P was selected on the same twenty questions it is evaluated on; its 20/20 is not a guarantee on new questions. It holds two models of the same family, so their errors may be correlated.
+- The zero check is model-free only for F2 (C02, C08, C09, C11). For F2b (C10) and for the combinations, the population still comes from the reference query, which a live service does not have: on F2b the zero check is a requirement, not an implemented control (see the cross-review by Pair C of Step 2).
 - Variability: temperature 0 does not guarantee identical answers on a new run. The inconsistency of gpt-oss-20b between F2 (2/4) and F4 (5/5) is probably such variability, which is why F4 keeps a quorum.
 - Prices come from two sources and two dates (portfolio of 2026-09-28, Groq pages of 2026-10-21). dots-3-note and north-mini-code have no documented paid route.
 - The token envelope (1 000 input, 300 output) is an assumption; the TD 1 traces show about 600 input and 150 to 260 output tokens on average.
@@ -251,6 +252,20 @@ Two rounds, offline, by reading the code, the diffs and the produced tables agai
 - **Step 1 (Pair A), consistent.** `python tableau-vote.py` gives, for the fixed 2-of-3 panel, 15 correct consensus, 5 abstentions (C09, C10, C16, C17, C19) and no wrong consensus. Pair B's independent count in [td2/pair-b-outputs/panels.json](../td2/pair-b-outputs/panels.json) gives the same 15 / 5 / 0. C19 is the only question where 3-of-5 decides (1990, correct) while 2-of-3 abstains. To do by Pair A: copy the table into this report (Step 1 section) and comment C19.
 - **Step 3 (Pair C), one point to fix.** For F2 and F2b the check is a "2-of-3 quorum anchored on gpt-oss-120b", but the panel is not declared. Anchoring is not enough: the panel {gpt-oss-120b, qwen3.8-27b, dots-3-note} contains gpt-oss-120b and still accepts the wrong 0 on C09 (qwen and dots outvote it). The rule should name the panel and exclude having both qwen3.8-27b and dots-3-note in it for the age families, or add the population check before accepting a 0.
 - **Step 3, minor.** In the "unknown capability" scenario the action is `abstain` but `checks` reads "2-of-3 quorum": a check on a request that is not run is confusing in the trace.
+
+## Cross-review by Pair C
+
+Read on commit 024a46d, offline. The vote, the table and the key figures were recomputed with our own scripts; the full review, with the material, is in [td2/peer-review-pair-C.md](../td2/peer-review-pair-C.md). Both steps are sound: no wrong figure was found.
+
+- **Step 1 (Pair A), consistent.** The five rules of `vote_k_sur_n` hold on our boundary tests (strict majority, duplicates including errors, errors kept in n, a vote on 0, all members failing). The table [td2-table.md](td2-table.md) has 0 difference with an independent vote on the twenty questions: 15 / 5 / 0 for the fixed panel, 16 / 4 / 0 for 3-of-5, and C19 is the only change.
+  - **To do: comment C19.** The fixed panel sees three different values (1 990, 71 640, 83 580) and abstains; 3-of-5 sees 1 990 three times and decides. That consensus depends on a retry: gpt-oss-20b got HTTP 429 on its first attempt and answered correctly on the second. Without it, 1 990 would have 2 votes out of 3 required.
+  - **To do: table and duplicate test in the report.** The Step 1 section still reads "to complete"; the table is in a separate file, in French; no recorded test shows the refusal of a duplicate (the function does refuse it).
+  - Minor: `tableau-vote.py` keeps the last row in file order, not the highest attempt. It is right for this file, and would pick an older attempt if the files were merged in another order.
+- **Step 2 (Pair B), consistent.** C09 is the only shared wrong value of the batch (we also checked the non-zero values). We recomputed the population (6 customers, 68 lines), the chain of qwen3.8-27b (72, 14, 0), the reading of dots-3-note (one customer born on 2001-09-26, last order on 2026-09-20), the quorum table, the wrong and true zeros, and the script runs offline without changing the repository.
+  - **To do: the delta query must list the customers.** The assignment asks for the `customer_id` rows with their revenue and the exact cent difference. The six customers and their revenue (118 740, 61 330, 99 090, 25 920, 135 000, 47 900) sum to 487 980; each wrong query returns 0, so the difference is 487 980 cents. The query and the table are in the review file.
+  - **To do: qualify the "model-free" claim.** The independent `date()` window exists for C02, C08, C09 and C11 only. For C10, C15 and C16, three of the six wrong zeros, the population is the `COUNT(*)` of the reference query, which a live service does not have: the flag is circular there. The Limitations section says part of it; the Summary and the section "Consequence and independent check" should say it too.
+  - Minor: the fixed panel avoids C09 by accident. Had north-mini-code answered 0, it would have decided a wrong consensus on 0.
+- **Effect on Step 3.** Our zero check on F2b is not model-free yet (same cause). We added it to the limitations of Step 3.
 
 ## Limitations
 
