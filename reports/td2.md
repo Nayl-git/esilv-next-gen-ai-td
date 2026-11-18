@@ -101,6 +101,14 @@ python atelier-routage.py                        # nine scenarios
 
 *To complete by Pair C: the one-page rule per family (first model, check by use, course of action if unavailable), with the TD 1 cells that justify it. Pair B's result to take into account: no 2-of-3 quorum holding both qwen3.8-27b and dots-3-note for the age families, and a population check before accepting a 0.*
 
+## Cross-review by Pair B
+
+Read on commit 4cc60e5, offline.
+
+- **Step 1 (Pair A), consistent.** `python tableau-vote.py` gives, for the fixed 2-of-3 panel, 15 correct consensus, 5 abstentions (C09, C10, C16, C17, C19) and no wrong consensus. Pair B's independent count in [td2/pair-b-outputs/panels.json](../td2/pair-b-outputs/panels.json) gives the same 15 / 5 / 0. C19 is the only question where 3-of-5 decides (1990, correct) while 2-of-3 abstains. To do by Pair A: copy the table into this report (Step 1 section) and comment C19.
+- **Step 3 (Pair C), one point to fix.** For F2 and F2b the check is a "2-of-3 quorum anchored on gpt-oss-120b", but the panel is not declared. Anchoring is not enough: the panel {gpt-oss-120b, qwen3.8-27b, dots-3-note} contains gpt-oss-120b and still accepts the wrong 0 on C09 (qwen and dots outvote it). The rule should name the panel and exclude having both qwen3.8-27b and dots-3-note in it for the age families, or add the population check before accepting a 0.
+- **Step 3, minor.** In the "unknown capability" scenario the action is `abstain` but `checks` reads "2-of-3 quorum": a check on a request that is not run is confusing in the trace.
+
 ## Limitations
 
 - One run per cell, 20 questions × 5 models: the results support hypotheses about this batch, not error rates, a ranking or a quorum guarantee.
@@ -115,8 +123,9 @@ python atelier-routage.py                        # nine scenarios
 |---|---|---|
 | ambrere | A | `vote_k_sur_n` (commit f399f1a) |
 | *to complete* | A | |
-| enkimlt | B | Wrong-consensus analysis of C09: scan, quorums and panels, SQL cause and delta query, population check, DEMO-VOTE ([td2/](../td2/)); this report's Step 2 |
-| *to complete* | B | |
+| enkimlt | B | Wrong-consensus analysis of C09: scan, quorums and panels, SQL cause and delta query, population check, DEMO-VOTE ([td2/](../td2/)); this report's Step 2; cross-review of Steps 1 and 3 |
+| nohamsantenac | B | *to complete* |
+| PierreBOUDRAA | B | *to complete* |
 | Nayl-git | C | Adaptation of the routing simulator (commit def1d6e); `td1/` and `td2/` folders |
 | *to complete* | C | |
 
