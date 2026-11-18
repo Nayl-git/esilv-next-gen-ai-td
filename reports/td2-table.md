@@ -20,12 +20,3 @@
 | C18 | 62480 | 62480 (2 voix) OK | 62480 (3 voix) OK | non |
 | C19 | 1990 | abstention (1 voix max) | 1990 (3 voix) OK | OUI |
 | C20 | 1106090 | 1106090 (3 voix) OK | 1106090 (5 voix) OK | non |
-
-### Questions où la décision change (à commenter)
-
-**C19** (référence 1990) : valeurs et verdicts des 5 modèles
-- groq:openai/gpt-oss-120b -> value=1990, verdict=correct, http=200, error=-
-- openrouter:cohere/north-mini-code:free -> value=71640, verdict=incorrect, http=200, error=-
-- groq:qwen/qwen3.8-27b -> value=83580, verdict=incorrect, http=200, error=-
-- groq:openai/gpt-oss-20b -> value=1990, verdict=correct, http=200, error=-
-- openrouter:dots-studio/dots-3-note-preview:free -> value=1990, verdict=correct, http=200, error=-
