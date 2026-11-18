@@ -106,7 +106,7 @@ Result of the check on the twenty questions ([check.json](pair-b-outputs/check.j
 | C15 | 168 680 | 27 | qwen3.8-27b | yes |
 | C16 | 376 740 | 55 | north-mini-code | yes |
 
-Every wrong 0 of the batch is flagged (7 questions), and neither true zero is rejected. **Limit:** the check only catches the "empty filter" errors. It does not catch a non-zero wrong value (e.g. dots on C16 = 1 447 730, qwen on C16 = 367 050, off by one day). For those, the candidate checks are the reference query for the amount paid out, and human review, as in Pair C's routing rule.
+Every wrong 0 of the batch is flagged (7 wrong zeros on 6 questions), and neither true zero is rejected. **Limit:** the check only catches the "empty filter" errors. It does not catch a non-zero wrong value (e.g. dots on C16 = 1 447 730, qwen on C16 = 367 050, off by one day). For those, the candidate checks are the reference query for the amount paid out, and human review, as in Pair C's routing rule.
 
 ## 5. Supplied synthetic case: DEMO-VOTE
 
