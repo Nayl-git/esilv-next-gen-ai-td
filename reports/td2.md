@@ -75,7 +75,7 @@ Totals: 2-of-3 gives 15 correct consensus, 5 abstentions (C09, C10, C16, C17, C1
 
 **Thin margins.** C02, C08, C11 and C18 pass the 2-of-3 panel with 2 votes only: north-mini-code returns a wrong figure (C02 2 606 320, C11 0, C18 286 650) or invalid SQL (C08). The decision does not change, but one more failure among the two other members would have made the panel abstain. Under 3-of-5 the same four questions get 3 votes, exactly k.
 
-**Pair A response to the cross-reviews of Pairs B and C.** The table, in English, the C19 comment and the duplicate test are now in this section; the Step 1 "to complete" notes are closed. Not changed: `tableau-vote.py` still keeps the last row in file order (right for this file; both reviewers flagged it as minor).
+**Pair A response to the cross-reviews of Pairs B and C.** The table, in English, the C19 comment and the duplicate test are now in this section; the Step 1 "to complete" notes are closed. `tableau-vote.py` now keeps, for each model, the attempt with the highest `attempts` number instead of the last row of the file, as both reviewers suggested; on `traces-td1.csv` the table is identical.
 
 ## Step 2: the wrong consensus (Pair B)
 
@@ -380,9 +380,9 @@ Pair A reviewed Steps 2 and 3 by reading the documents, without re-running them;
 
 | GitHub account | Pair | Contribution |
 |---|---|---|
-| ambrere | A | `vote_k_sur_n` (commit f399f1a); `tableau-vote.py` and the 2-of-3 vs 3-of-5 table; the Step 1 section of this report (table in English, comment on C19, duplicate-route test) |
-| AmandineBaranger | A | TD 1: run of gpt-oss-120b on the twenty questions and its summary files (commits 1ad5688, 59358b7, bb8ccae). TD 2 share: *to be confirmed by this member* |
-| FeliciaEsilv | A | TD 1: SQL queries for C03 and C04 (commit b16a075). TD 2 share: *to be confirmed by this member* |
+| ambrere | A | `vote_k_sur_n` (commit f399f1a); `tableau-vote.py` (last attempt chosen by its `attempts` number) and the 2-of-3 vs 3-of-5 table; the Step 1 section of this report (table in English, comment on C19, duplicate-route test) |
+| AmandineBaranger | A | TD 1: run of gpt-oss-120b on the twenty questions and its summary files (commits 1ad5688, 59358b7, bb8ccae). No TD 2 commit under this account |
+| FeliciaEsilv | A | TD 1: SQL queries for C03 and C04 (commit b16a075). No TD 2 commit under this account |
 | enkimlt | B | Step 2, shared equally with nohamsantenac and PierreBOUDRAA (see note below) |
 | nohamsantenac | B | Step 2, shared equally with enkimlt and PierreBOUDRAA (see note below) |
 | PierreBOUDRAA | B | Step 2, shared equally with enkimlt and nohamsantenac (see note below) |

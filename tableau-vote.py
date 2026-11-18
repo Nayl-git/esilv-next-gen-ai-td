@@ -34,11 +34,14 @@ def load_vote():
 
 
 def last_rows(rows, case, nature):
-    """Last attempt per (provider, model) for one question: same rule as atelier-vote.py."""
+    """Last attempt per (provider, model) for one question: the highest `attempts` number,
+    whatever the order of the rows in the file (a tie keeps the later row)."""
     selected = {}
     for row in rows:
         if row["case_id"] == case and row["nature"] == nature:
-            selected[(row["provider"], row["model_requested"])] = row
+            key = (row["provider"], row["model_requested"])
+            if key not in selected or int(row["attempts"] or 0) >= int(selected[key]["attempts"] or 0):
+                selected[key] = row
     return selected
 
 
