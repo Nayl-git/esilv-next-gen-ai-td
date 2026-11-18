@@ -109,9 +109,10 @@ def checks_for(request, r):
         perfect = ok == n and n >= 4
     age = family in ("F2", "F2b")
     if use == "payout":
-        if family in ("F1", "F3"):
-            return "3-of-5 quorum, then human review"
-        return "reference check or human review"
+        # Same control for every family. The lab reference does not exist in production, so the
+        # control is a model-free recomputation (a parameterised query per family; implemented
+        # for F2 only, see td2/wrong_consensus.py) followed by a human review.
+        return "3-of-5 quorum, then deterministic recomputation, then human review"
     if use == "customer":
         return PANEL + ("; " + ZERO_CHECK if age else "")
     if perfect and family in ("F1", "F3"):          # dashboard, 100 % on at least 4 cells
