@@ -124,5 +124,5 @@ The 2-of-3 vote returns `consensus: true, value: 0, votes: 2`; the reference is 
 ## 6. Limits
 
 - One case in 20 questions × 5 models. This supports a hypothesis about this batch, not an error rate or a ranking.
-- The vote used here is a local copy of the TD 2 contract written in `wrong_consensus.py`. Once Pair A pushes `vote_k_sur_n`, `python atelier-vote.py --traces traces-td1.csv --case C09` must give the same fixed-panel decision (abstention, 1 vote).
+- The vote used for the panel comparison is a local copy of the TD 2 contract written in `wrong_consensus.py`. Cross-check with Pair A's `vote_k_sur_n` (commit f399f1a): `python atelier-vote.py --traces traces-td1.csv --case C09` returns `{"consensus": false, "value": null, "votes": 1, "models": []}`, the same fixed-panel decision (abstention, 1 vote).
 - The population check uses the `date()` window for F2 only; for the other families it falls back to the population of the reference query, which a live service would not have. Writing a model-free population query per family remains to be done before it can run in production.
