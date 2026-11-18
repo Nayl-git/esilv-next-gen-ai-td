@@ -10,7 +10,7 @@ No new batch of network calls: everything runs on the stored TD 1 traces ([trace
 |---|---|---|---|
 | A | Step 1: `Orchestrateur.vote_k_sur_n`, then the 2-of-3 vs 3-of-5 table on the twenty questions | to update by Pair A | [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py) |
 | B | Step 2: a verified wrong consensus, with SQL root cause and delta query | done: C09, qwen3.8-27b and dots-3-note both return 0 (ref 487 980); fixed 2-of-3 panel abstains; population check flags it | [wrong-consensus-C09.md](wrong-consensus-C09.md), [wrong_consensus.py](wrong_consensus.py), [pair-b-outputs/](pair-b-outputs/) |
-| C | Step 3: routing rule per question family, simulator before and after, priority analysis | simulator adapted and committed; one-page rule and priority analysis to write in the report | [atelier-routage.py](../atelier-routage.py), [routage-avant.jsonl](../routage-avant.jsonl), [routage-apres.jsonl](../routage-apres.jsonl) |
+| C | Step 3: routing rule per question family, simulator before and after, priority analysis | simulator adapted; draft of the rule and the priority analysis in [draft-pair-C-section.md](draft-pair-C-section.md), to integrate in the report | [atelier-routage.py](../atelier-routage.py), [routage-avant.jsonl](../routage-avant.jsonl), [routage-apres.jsonl](../routage-apres.jsonl) |
 
 Each pair keeps its own row up to date when it pushes. Pull before editing this file.
 
