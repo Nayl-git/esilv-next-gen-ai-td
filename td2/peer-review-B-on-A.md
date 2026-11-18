@@ -2,7 +2,7 @@
 
 Reviewers: Pair B (enkimlt, nohamsantenac, PierreBOUDRAA). Reviewed: Pair A, Step 1 (the k-of-n vote).
 
-**Provenance of this file.** Pair B reviewed offline, in two rounds (commits `4cc60e5` and `b1a5b35`), by reading the code, the diffs and the produced tables against the assignment, and recorded its remarks only as the section "Cross-review by Pair B" of [reports/td2.md](../reports/td2.md). This file reproduces the part of that section about Pair A (Step 1), word for word, so that each pair has one review file per pair reviewed. It was assembled from the report by Nayl SAIFOUDINE (Pair C), not written by Pair B, and adds no new check. Pair B should confirm that it matches what it did.
+**Provenance of this file.** Pair B reviewed offline, in two rounds (commits `4cc60e5` and `b1a5b35`), by reading the code, the diffs and the produced tables against the assignment, and recorded its remarks only as the section "Cross-review by Pair B" of [reports/td2.md](../reports/td2.md). This file reproduces the part of that section about Pair A (Step 1), word for word, so that each pair has one review file per pair reviewed. It was assembled from the report by Nayl SAIFOUDINE (Pair C), not written by Pair B, and adds no new check. Pair B has confirmed to Nayl SAIFOUDINE that it matches what it did.
 
 ## Second round (commit b1a5b35)
 
