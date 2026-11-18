@@ -13,7 +13,7 @@ This repository is the shared repository of sub-group **DIA2-1** for TD 1 to TD 
 | Session | Folder | Report | Results |
 |---|---|---|---|
 | TD 1, 21 October 2026 | [td1/](td1/README.md) | [reports/td1.md](reports/td1.md) | [reference-td1.csv](reference-td1.csv), [traces-td1.csv](traces-td1.csv), [model-question-comparison-en.csv](model-question-comparison-en.csv), [five-model-summary-en.csv](five-model-summary-en.csv) |
-| TD 2, 18 November 2026 | [td2/](td2/README.md) | `reports/td2.md`, hand-in by 22 November | [atelier-routage.py](atelier-routage.py), [routage-avant.jsonl](routage-avant.jsonl), [routage-apres.jsonl](routage-apres.jsonl) |
+| TD 2, 18 November 2026 | [td2/](td2/README.md) | [reports/td2.md](reports/td2.md), hand-in by 22 November | vote: [skeleton-multi-llm-en.py](skeleton-multi-llm-en.py), [tableau-vote.py](tableau-vote.py); wrong consensus: [td2/wrong-consensus-C09.md](td2/wrong-consensus-C09.md), [td2/wrong_consensus.py](td2/wrong_consensus.py); routing: [atelier-routage.py](atelier-routage.py), [routage-avant.jsonl](routage-avant.jsonl), [routage-apres.jsonl](routage-apres.jsonl) |
 
 The kit scripts, the database and the TD 1 result files stay at the repository root: the scripts look for them there. Each `tdN/` folder holds the README that indexes that session.
 
