@@ -23,27 +23,28 @@ Failing cells: gpt-oss-20b C02, C11; qwen C09, C10, C15, C16, C17, C19; dots C08
 
 ### Reference prices
 
-Paid route of the same model, USD per million tokens (input, output), from the portfolio sheet: gpt-oss-20b 0.075 and 0.30 (Groq pricing page, read on 2026-10-21); gpt-oss-120b 0.15 and 0.60 (OpenRouter, portfolio of 2026-09-28); qwen3.8-27b 0.80 and 4.00 (Groq, 2026-10-21). dots-3-note and north-mini-code have no documented paid route (N/A), so they cannot be ranked by price. With an assumed envelope of 1 000 input and 300 output tokens per request, one request costs 0.000165 USD on gpt-oss-20b, 0.00033 USD on gpt-oss-120b and 0.002 USD on qwen3.8-27b.
+Paid route of the same model, USD per million tokens (input, output), from the portfolio sheet: gpt-oss-20b 0.075 and 0.30 (Groq pricing page, read on 2026-10-21); gpt-oss-120b 0.15 and 0.60 (OpenRouter, portfolio of 2026-09-28); qwen3.8-27b 0.80 and 4.00 (Groq, 2026-10-21). dots-3-note and north-mini-code have no documented paid route (N/A), so they cannot be ranked by price. They are free on OpenRouter and correct on F1 and F3, but they are not the first model there for two reasons: a price rule needs a price, and the OpenRouter free routes are limited to 50 requests per day, which a first-line model cannot depend on. In the simulator they come after every priced model, as a fallback. With an assumed envelope of 1 000 input and 300 output tokens per request, one request costs 0.000165 USD on gpt-oss-20b, 0.00033 USD on gpt-oss-120b and 0.002 USD on qwen3.8-27b.
 
 ### The rule
 
-First model: the cheapest model by reference price that answered every question of the family correctly in TD 1. Fallback: the next eligible model, then wait for the free quota to refill if the request can wait, then abstain.
+First model: the cheapest model by reference price that answered every question of the family correctly in TD 1. Fallback, in the order of the branches of `choose`: the next eligible model on included capacity, then wait for the free quota to refill if the request can wait, then the paid gpt-oss-120b route if it fits the budget (0.00033 USD per request), then abstain.
 
 Declared panel **P** = {gpt-oss-120b, gpt-oss-20b, qwen3.8-27b}, used for every "2-of-3" below (k = 2, a value needs two votes, no value is invented when none reaches k). P never holds qwen3.8-27b and dots-3-note together (see the panel results below). "Zero check" is Pair B's population check: a result of 0 is not accepted when the targeted population is not empty.
 
 | Family | First model (TD 1 evidence) | Internal dashboard | Customer-facing figure | Payout | Fallback |
 |---|---|---|---|---|---|
-| F1 period | gpt-oss-20b, 6/6 | none | 2-of-3 on P | 3-of-5 quorum, then human review | gpt-oss-120b, then wait, then abstain |
-| F3 product list | gpt-oss-20b, 4/4 | none | 2-of-3 on P | 3-of-5 quorum, then human review | gpt-oss-120b, then wait, then abstain |
-| F4 combinations | gpt-oss-20b, 5/5 | 2-of-3 on P | 2-of-3 on P | reference check or human review | gpt-oss-120b, then wait, then abstain |
-| F2 age at a date | gpt-oss-120b, 4/4 (the only model without an error) | deterministic check | 2-of-3 on P and zero check | reference check or human review | wait for refill, then abstain |
-| F2b age at the order | gpt-oss-120b, 1/1 | 2-of-3 on P and zero check | 2-of-3 on P and zero check | reference check or human review | wait for refill, then abstain |
+| F1 period | gpt-oss-20b, 6/6 | none | 2-of-3 on P | 3-of-5 quorum, then human review | gpt-oss-120b, then wait, then paid route, then abstain |
+| F3 product list | gpt-oss-20b, 4/4 | none | 2-of-3 on P | 3-of-5 quorum, then human review | gpt-oss-120b, then wait, then paid route, then abstain |
+| F4 combinations | gpt-oss-20b, 5/5 | 2-of-3 on P | 2-of-3 on P | reference check or human review | gpt-oss-120b, then wait, then paid route, then abstain |
+| F2 age at a date | gpt-oss-120b, 4/4 (the only model without an error) | read-only execution and zero check | 2-of-3 on P and zero check | reference check or human review | no other model is eligible: wait for refill, then paid gpt-oss-120b route, then abstain |
+| F2b age at the order | gpt-oss-120b, 1/1 | 2-of-3 on P and zero check | 2-of-3 on P and zero check | reference check or human review | no other model is eligible: wait for refill, then paid gpt-oss-120b route, then abstain |
 
 Consistency with the constraint of the assignment:
 - `none` appears only for an internal dashboard, on F1 and F3, where the first model had 100 % in TD 1 on at least four questions.
 - F4 has 5/5 for gpt-oss-20b, but it is the same model that failed two of four plain age questions (F2). The age logic is therefore not stable for this model, and F4 keeps a quorum even for a dashboard.
 - F2b rests on a single question (C10). A 100 % rate on one cell does not show reliability, so `none` is refused whatever the model.
 - Any figure that reaches a customer or triggers a payout requires a quorum or a deterministic check, whatever the family.
+- The F2 dashboard check is the read-only execution of the query plus the zero check. Read-only execution alone does not catch a wrong 0: the two wrong zeros of C09 are valid SQL that executes without error.
 - Including gpt-oss-120b in the panel is not enough. On C09, qwen3.8-27b and dots-3-note both returned 0 instead of 487 980, while gpt-oss-120b and gpt-oss-20b returned the reference. The panel {gpt-oss-120b, qwen3.8-27b, dots-3-note} contains gpt-oss-120b and still accepts the wrong 0, because the two weaker models outvote it (Step 2, and the cross-review by Pair B). The panel therefore has to be declared, and it must not hold qwen3.8-27b and dots-3-note together. For the age families, the zero check is added as a second defence.
 
 ### 2-of-3 panels evaluated on the TD 1 traces
@@ -62,6 +63,8 @@ Each panel was evaluated with k = 2 on the twenty questions (the final result of
 
 The only wrong consensus of the batch appears in the three panels that contain qwen3.8-27b and dots-3-note together. P and {gpt-oss-120b, gpt-oss-20b, dots-3-note} both reach 20/20. We keep P because its three members run on one provider, Groq, with documented paid prices, whereas dots-3-note has no documented paid route. Two caveats: P was chosen after reading these traces, so its 20/20 is an optimistic in-sample figure, and gpt-oss-120b and gpt-oss-20b belong to the same model family, so their errors may be correlated (in TD 1 the two errors of gpt-oss-20b, C02 and C11, were outvoted by the two other members).
 
+**Coverage versus independence.** P holds two gpt-oss models, which Step 2 counts as one family. A panel of distinct families that does not hold qwen3.8-27b and dots-3-note together is {gpt-oss-120b, qwen3.8-27b, north-mini-code}, the fixed panel of Step 1: it gives 15 correct consensus, 5 abstentions and 0 wrong consensus, so it never fails silently but abstains on a quarter of the questions (C09, C10, C16, C17, C19). P covers the twenty questions, at the price of a possible correlation between its two gpt-oss members. We keep P for customer-facing figures because an abstention only delays the answer, while the age families also pass the zero check and payouts need a reference check or a human review on top. If an error shared by the two gpt-oss models appears on a new question, the rule switches to the distinct-family panel, and a disagreement inside P is treated as an abstention.
+
 Why these checks. A dashboard error is visible and cheap to fix, so a model with a perfect record may answer alone on the simple families. A figure shown to a customer cannot be corrected silently, so two independent models must agree. A payout is irreversible, so on top of the quorum a deterministic recomputation or a human review closes the loop.
 
 ### Simulator: before and after
@@ -71,7 +74,7 @@ The kit simulator ([routage-avant.jsonl](../routage-avant.jsonl)) uses three fic
 | Scenario | Before | After |
 |---|---|---|
 | simple | run, small-free | run, gpt-oss-20b free plan, F1 dashboard, check none (6/6 on C01, C04, C05, C06, C07, C20) |
-| complex | run, senior-subscription | run, gpt-oss-120b free plan, F2 dashboard, deterministic check (4/4 on C02, C08, C09, C11) |
+| complex | run, senior-subscription | run, gpt-oss-120b free plan, F2 dashboard, read-only execution and zero check (4/4 on C02, C08, C09, C11) |
 | deferrable | defer 60 min, senior-subscription | defer 60 min, gpt-oss-120b free plan, F2 |
 | urgent | run, senior-api (0.30) | run, gpt-oss-120b paid route (0.00033), F2 |
 | budget exhausted | abstain | abstain, "F2 needs level 3", check "not applicable (request not run)" |
@@ -83,6 +86,22 @@ The kit simulator ([routage-avant.jsonl](../routage-avant.jsonl)) uses three fic
 An abstention used to display a quorum check on a request that was not run, which made the trace confusing (remark of the cross-review by Pair B). The check now reads "not applicable (request not run)".
 
 The seven original scenarios give the same action as before (run, run, defer, run, abstain, run, abstain). What changes is the resource, the check and the reason. The levels come from TD 1: level 3 (F2) is reached only by gpt-oss-120b; level 2 (F4, F2b) by gpt-oss-20b; level 1 (F1, F3) by every model. In the "exhausted" scenarios, we assume the Groq free plan refills in 60 minutes; this is a scenario input.
+
+### Effect of the cross-review on the results
+
+The first version of the rule and of the simulator (commit def1d6e) was changed after the cross-review by Pair B, so its results and its outputs differ from the final ones. The actions of the simulator did not change; the checks, the panel and the figures did.
+
+| Item | First version (def1d6e) | After round 1 (e6d376b) | After round 2 (final) |
+|---|---|---|---|
+| Quorum for F2 and F2b figures | "2-of-3 quorum anchored on gpt-oss-120b", panel not declared | panel P declared; zero check added for F2 and F2b | unchanged, with the coverage-versus-independence trade-off stated |
+| Wrong consensus on C09 | possible: {gpt-oss-120b, qwen3.8-27b, dots-3-note} accepts the wrong 0 and anchoring on gpt-oss-120b does not prevent it | none in P: 20 correct, 0 abstention, 0 wrong on the TD 1 traces | unchanged |
+| Check of an abstention (budget exhausted, unknown capability) | a check was displayed for a request that is not run ("deterministic check", "2-of-3 quorum") | "not applicable (request not run)" | unchanged |
+| F2 dashboard check | "deterministic check (read-only execution and plausibility)", which does not catch a wrong 0 | unchanged | read-only execution and zero check |
+| Fallback of F2 and F2b | "wait for refill, then abstain", while the "urgent" scenario runs the paid route | unchanged | wait, then paid gpt-oss-120b route, then abstain |
+| Price ranking | free models left out without explanation | unchanged | explanation added |
+| Outputs [routage-apres.jsonl](../routage-apres.jsonl) | nine scenarios, checks of the first version | checks of the abstentions and of the customer figures changed | checks of the three F2 dashboard scenarios (complex, deferrable, urgent) changed |
+
+The seven original scenarios keep the same actions as the kit in all three versions (run, run, defer, run, abstain, run, abstain). The evidence of the first version stays in the history of the repository.
 
 ### Priority analysis: included capacity before deferring
 
@@ -100,7 +119,7 @@ In our adapted rule the same order applies to the paid route. In the "deferrable
 ### Limitations
 
 - Small samples: four to six questions per family, and a single question for F2b. The rates are a routing hypothesis for this batch, not a ranking of the models.
-- Panel P was selected on the same twenty questions it is evaluated on; its 20/20 is not a guarantee on new questions.
+- Panel P was selected on the same twenty questions it is evaluated on; its 20/20 is not a guarantee on new questions. It holds two models of the same family, so their errors may be correlated.
 - Variability: temperature 0 does not guarantee identical answers on a new run. The inconsistency of gpt-oss-20b between F2 (2/4) and F4 (5/5) is probably such variability, which is why F4 keeps a quorum.
 - Prices come from two sources and two dates (portfolio of 2026-09-28, Groq pages of 2026-10-21). dots-3-note and north-mini-code have no documented paid route.
 - The token envelope (1 000 input, 300 output) is an assumption; the TD 1 traces show about 600 input and 150 to 260 output tokens on average.
@@ -109,7 +128,7 @@ In our adapted rule the same order applies to the paid route. In the "deferrable
 
 ### Questions no free model handles alone
 
-On F2 and F2b, only gpt-oss-120b has no error in TD 1, and on F2b the evidence is a single question. These families set the checking cost carried into TD 3: every customer-facing or payout figure about a customer's age needs a quorum or a deterministic check on top of the model call.
+All five TD 1 routes are free (the Groq free plan and the OpenRouter `:free` routes). On F2 and F2b, four of the five models made at least one error, and only gpt-oss-120b has none; on F2b that rests on a single question. No single free model can therefore be trusted alone on the age questions, and gpt-oss-120b depends on one free plan whose quota limits an answer to what the plan allows (Groq: 1 000 requests per day, 8 000 tokens per minute). These families set the checking cost carried into TD 3: every customer-facing or payout figure about a customer's age needs a quorum or a deterministic check on top of the model call.
 
 ### Contributions
 
