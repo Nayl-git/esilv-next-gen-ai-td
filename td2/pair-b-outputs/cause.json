@@ -58,8 +58,72 @@
   "max_order_date": "2026-09-20 19:24:25"
  },
  "delta_reference_minus_wrong": {
-  "sql": "SELECT o.rowid FROM orders o JOIN customers c ON ... WHERE <reference> EXCEPT SELECT o.rowid ... WHERE <wrong>",
   "qwen_missing_lines": 68,
-  "dots_missing_lines": 68
+  "qwen_added_lines": 0,
+  "dots_missing_lines": 68,
+  "dots_added_lines": 0
+ },
+ "delta_by_customer": {
+  "sql": "SELECT c.customer_id, c.birth_date, COUNT(*) AS order_lines, SUM(o.quantity_product * p.price) AS revenue_cents FROM orders o JOIN customers c ON o.customer_id = c.customer_id JOIN product p ON o.product_id = p.product_id WHERE (CAST(strftime('%Y','2026-09-26') AS INTEGER) - CAST(strftime('%Y',c.birth_date) AS INTEGER) - (strftime('%m-%d','2026-09-26') < strftime('%m-%d',c.birth_date))) = 25 GROUP BY c.customer_id, c.birth_date ORDER BY c.birth_date, c.customer_id",
+  "rows": [
+   {
+    "customer_id": "C007",
+    "birth_date": "2000-11-30",
+    "order_lines": 18,
+    "revenue_cents": 118740,
+    "kept_by_qwen": false,
+    "kept_by_dots": false
+   },
+   {
+    "customer_id": "C009",
+    "birth_date": "2001-03-10",
+    "order_lines": 9,
+    "revenue_cents": 61330,
+    "kept_by_qwen": false,
+    "kept_by_dots": false
+   },
+   {
+    "customer_id": "C008",
+    "birth_date": "2001-05-15",
+    "order_lines": 11,
+    "revenue_cents": 99090,
+    "kept_by_qwen": false,
+    "kept_by_dots": false
+   },
+   {
+    "customer_id": "C002",
+    "birth_date": "2001-09-24",
+    "order_lines": 6,
+    "revenue_cents": 25920,
+    "kept_by_qwen": false,
+    "kept_by_dots": false
+   },
+   {
+    "customer_id": "C001",
+    "birth_date": "2001-09-25",
+    "order_lines": 18,
+    "revenue_cents": 135000,
+    "kept_by_qwen": false,
+    "kept_by_dots": false
+   },
+   {
+    "customer_id": "C003",
+    "birth_date": "2001-09-26",
+    "order_lines": 6,
+    "revenue_cents": 47900,
+    "kept_by_qwen": false,
+    "kept_by_dots": false
+   }
+  ],
+  "total_revenue_cents": 487980,
+  "wrong_values": {
+   "qwen3.8-27b": 0,
+   "dots-3-note": 0
+  },
+  "difference_cents": {
+   "qwen3.8-27b": 487980,
+   "dots-3-note": 487980
+  },
+  "explained_by_rows": true
  }
 }

@@ -7,7 +7,7 @@ No new network batch: every result below comes from the stored TD 1 traces ([tra
 ## Summary
 
 - **Step 1 (Pair A):** `Orchestrateur.vote_k_sur_n` is implemented in [skeleton-multi-llm-en.py](../skeleton-multi-llm-en.py) (commit f399f1a). *To complete by Pair A: the table of the twenty decisions.*
-- **Step 2 (Pair B):** one real wrong consensus in our batch, **C09**: `qwen3.8-27b` and `dots-3-note` both return **0** cents for a reference of **487 980**, through two different SQL errors. The fixed 2-of-3 panel **abstains** on C09; a panel {gpt-oss, qwen, dots} would accept 0. A model-free population check flags every wrong 0 of the batch and no true zero.
+- **Step 2 (Pair B):** one real wrong consensus in our batch, **C09**: `qwen3.8-27b` and `dots-3-note` both return **0** cents for a reference of **487 980**, through two different SQL errors. The fixed 2-of-3 panel **abstains** on C09; a panel {gpt-oss, qwen, dots} would accept 0. The delta query lists the six customers the two faulty queries miss; their revenue sums to the whole gap, 487 980 cents. A population check rejects a 0 when the targeted population is not empty: computed without any model for the age-at-a-date questions, it flags the wrong zeros of C02, C09 and C11; for C10, C15 and C16 the population still comes from the reference query, so the check is not yet model-free there.
 - **Step 3 (Pair C):** the routing simulator is adapted to our five TD 1 models ([atelier-routage.py](../atelier-routage.py)), outputs before and after in [routage-avant.jsonl](../routage-avant.jsonl) and [routage-apres.jsonl](../routage-apres.jsonl). The rule gives, for each question family, a first model, a check by use and a fallback, and declares the quorum panel {gpt-oss-120b, gpt-oss-20b, qwen3.8-27b}. **The results of the first version differ from the final ones because of the cross-review by Pair B**: the panel was not declared and a panel holding qwen3.8-27b and dots-3-note accepts the wrong 0 of C09; see "Effect of the cross-review on the results".
 
 ## Work completed
@@ -59,11 +59,35 @@ Scanning the twenty questions × five models finds **one** question where at lea
 
 ### Cause in the SQL
 
-Each stored query was replayed on the database, condition by condition.
+Each stored query was replayed on the database, condition by condition. The complete reference query and the two complete faulty queries, as stored in the traces, are in [td2/wrong-consensus-C09.md](../td2/wrong-consensus-C09.md), section 2.
 
 - **qwen3.8-27b** computes the age at the **order date** instead of the reference date, then adds `month-day(order) >= month-day(birth)` and `month-day(order) < month-day(birth + 26 years)`. Adding 26 years does not change a month-day (0 customers born on 29 February), so the two bounds contradict each other: 72 → 14 → **0** lines.
 - **dots-3-note** reads "exactly 25" as "**turns** 25 on 2026-09-26" (one customer, born 2001-09-26), then adds an order-date filter on 2026-09-26 that the question does not contain. The last order in the base is dated 2026-09-20: 72 → 6 → **0** lines.
-- Delta query (reference lines `EXCEPT` wrong-query lines): 68 of 68 reference lines missed by each model.
+- **Delta query**, executed read-only on `data/boutique.sqlite`: the `customer_id` rows that the reference counts and the faulty queries miss, with their revenue excluding VAT. Both faulty queries keep no line, so the delta is the whole reference population; no row is wrongly added.
+
+```sql
+SELECT c.customer_id, c.birth_date, COUNT(*) AS order_lines,
+       SUM(o.quantity_product * p.price) AS revenue_cents
+FROM orders o
+JOIN product p   ON p.product_id  = o.product_id
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE (CAST(strftime('%Y', '2026-09-26') AS INTEGER) - CAST(strftime('%Y', c.birth_date) AS INTEGER)
+       - (strftime('%m-%d', '2026-09-26') < strftime('%m-%d', c.birth_date))) = 25
+GROUP BY c.customer_id, c.birth_date
+ORDER BY c.birth_date, c.customer_id;
+```
+
+| customer_id | birth_date | Order lines | Revenue excl. VAT (cents) |
+|---|---|---|---|
+| C007 | 2000-11-30 | 18 | 118 740 |
+| C009 | 2001-03-10 | 9 | 61 330 |
+| C008 | 2001-05-15 | 11 | 99 090 |
+| C002 | 2001-09-24 | 6 | 25 920 |
+| C001 | 2001-09-25 | 18 | 135 000 |
+| C003 | 2001-09-26 | 6 | 47 900 |
+| **Total** | | **68** | **487 980** |
+
+Exact difference: 487 980 − 0 = **487 980 cents** for each model, entirely explained by these six customers. qwen's Q1 (order year − birth year = 25) already drops C007, whose orders are all in 2026; dots's birth-date filter keeps only C003, and its order-date filter then drops C003 too.
 
 Observed: two **different** errors give the **same** value, because `COALESCE(SUM(...), 0)` turns any empty filter into 0, and 0 is a plausible answer (it is the correct value of C06 and C14). Hypothesis, not measured: 0 is the most likely shared wrong value for filter errors.
 
@@ -83,8 +107,8 @@ Across the seven 2-of-3 panels of three distinct families on the twenty question
 
 ### Consequence and independent check
 
-- **Panel:** for the age-at-a-date family, qwen3.8-27b and dots-3-note should not be able to outvote the strongest member together. Distinct families are necessary but not sufficient. The fixed panel avoids C09 only because north-mini-code failed to run; a different panel or an escalation is a candidate, not a guarantee.
-- **Population check:** next to the SUM, the service counts the targeted order lines **without any model**, with a second formulation of the age rule (`date()` window, distinct from the `strftime` reference), and rejects a 0 when that population is not empty. On the twenty questions, it flags all the wrong zeros (C02, C09, C10, C11, C15, C16) and none of the true zeros (C06, C14).
+- **Panel:** for the age-at-a-date family, qwen3.8-27b and dots-3-note should not be able to outvote the strongest member together. Distinct families are necessary but not sufficient. The fixed panel avoids the wrong consensus on C09 **by accident**: north-mini-code failed to run and cast no vote. Had it answered 0, the fixed panel would have decided a wrong consensus on 0; had it answered 487 980, it would have decided the correct value. A different panel or an escalation is a candidate, not a guarantee.
+- **Population check:** next to the SUM, the service counts the targeted order lines and rejects a 0 when that population is not empty. For the age-at-a-date questions (C02, C08, C09, C11), the count is computed **without any model and without the reference**, with a second formulation of the age rule (`date()` window, distinct from the `strftime` reference): it flags the wrong zeros of **C02, C09 and C11** (4 of the 7 wrong zeros). For **C10, C15 and C16** (the 3 others) and for the true zeros C06 and C14, the population is the `COUNT(*)` of the reference query: the result is right on our batch, but it is circular, since a live service has no reference. A model-free population query for age at the order and for the combinations is still to write.
 - **Limit:** it does not catch a wrong non-zero value (e.g. qwen C16 = 367 050, off by one day). For an amount paid out, the reference query or a human review remains necessary.
 
 ### Supplied synthetic case DEMO-VOTE
@@ -266,12 +290,21 @@ Read on commit 024a46d, offline. The vote, the table and the key figures were re
   - **To do: qualify the "model-free" claim.** The independent `date()` window exists for C02, C08, C09 and C11 only. For C10, C15 and C16, three of the six wrong zeros, the population is the `COUNT(*)` of the reference query, which a live service does not have: the flag is circular there. The Limitations section says part of it; the Summary and the section "Consequence and independent check" should say it too.
   - Minor: the fixed panel avoids C09 by accident. Had north-mini-code answered 0, it would have decided a wrong consensus on 0.
 - **Effect on Step 3.** Our zero check on F2b is not model-free yet (same cause). We added it to the limitations of Step 3.
+- **Pair B response, applied.** The delta query now lists the six customers with their revenue, summing to the 487 980-cent gap (Step 2 section above, and `delta_by_customer` in [cause.json](../td2/pair-b-outputs/cause.json)); the complete queries are in [wrong-consensus-C09.md](../td2/wrong-consensus-C09.md); the model-free claim is restricted to C02, C09 and C11 in the Summary, the Step 2 section and the write-up; the accidental abstention of the fixed panel is stated with both cases.
+
+## Cross-review by Pair A
+
+Pair A reviewed Steps 2 and 3 by reading the documents, without re-running them; the full review is in [td2/peer-review-pair-A.md](../td2/peer-review-pair-A.md). It agrees with the figures of Pairs B and C (families, totals per model, panel tables) and raises the same main points as Pair C.
+
+- **Step 2 (Pair B).** The delta query must list the customers with the exact cent difference; the two complete queries must be shown; the "every wrong 0 is flagged, model-free" claim must be restricted to C02, C08, C09 and C11; the selection of the last attempt should not depend on the file order.
+  - **Pair B response, applied.** Same corrections as for Pair C above. In addition, `wrong_consensus.py` now selects the last attempt by the highest `attempts` number, not by file order; on `traces-td1.csv` it gives the same row for all 100 cells, so no figure changed.
+- **Step 3 (Pair C).** Panel P holds two gpt-oss models (the most fragile point); the "reference check" of the payout rows does not exist in production; payouts get a weaker check on F2 and F4 than on F1 and F3, although F2 is where the wrong consensus appeared; the reason for a check on F2 dashboards should be written; the zero check on F2b and F4 is required but not implementable yet; the Contributions section is incomplete. *Pair C to answer.*
 
 ## Limitations
 
 - One run per cell, 20 questions × 5 models: the results support hypotheses about this batch, not error rates, a ranking or a quorum guarantee.
 - One wrong consensus only (C09). Its two causes are different; a conclusion about "shared errors" in general would need more cases.
-- The population check uses a model-free `date()` window for the age-at-a-date family only. For the other families, the population was taken from the reference query, which a live service would not have: a model-free population query per family is still to write.
+- The population check uses a model-free `date()` window for the age-at-a-date family only (C02, C08, C09, C11). For the other families, including three of the seven wrong zeros (C10, C15, C16), the population was taken from the reference query, which a live service would not have: a model-free population query per family is still to write.
 
 ## Contributions
 

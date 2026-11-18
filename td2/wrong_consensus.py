@@ -63,12 +63,27 @@ def vote_k_sur_n(proposals, k):
 
 
 def load_last():
-    """Last attempt per (model, case), real nature only, as atelier-vote.py does."""
+    """Last attempt per (model, case), real nature only.
+
+    The last attempt is the row with the highest `attempts` number (then the latest
+    `date_utc`), not the last row read: the result does not depend on the order in
+    which the trace files were merged. On traces-td1.csv it is the same row as the
+    last one in file order, for all 100 cells.
+    """
+    def rank(r):
+        try:
+            attempt = int(r.get("attempts") or 0)
+        except ValueError:
+            attempt = 0
+        return (attempt, r.get("date_utc") or "")
+
     last = {}
     with TRACES.open(encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             if r["nature"] == "real":
-                last[(f"{r['provider']}:{r['model_requested']}", r["case_id"])] = r
+                key = (f"{r['provider']}:{r['model_requested']}", r["case_id"])
+                if key not in last or rank(r) >= rank(last[key]):
+                    last[key] = r
     return last
 
 
@@ -198,14 +213,44 @@ def section_cause(con):
                                        .replace("o_date", "date")),
         "max_order_date": scalar(con, "SELECT MAX(date) FROM orders"),
     }
-    # Delta query: reference lines missed by each wrong query (all of them, since both return 0).
+    # Delta query, line level: reference lines missed by each wrong query, and lines wrongly added.
+    def missed(where):
+        return scalar(con, f"SELECT COUNT(*) FROM (SELECT o.rowid {FROM} WHERE {C09_REF_WHERE} "
+                           f"EXCEPT SELECT o.rowid {FROM} WHERE {where})")
+
+    def added(where):
+        return scalar(con, f"SELECT COUNT(*) FROM (SELECT o.rowid {FROM} WHERE {where} "
+                           f"EXCEPT SELECT o.rowid {FROM} WHERE {C09_REF_WHERE})")
+
+    qwen_where = " AND ".join(f"({c})" for _, c in qwen)
+    dots_where = " AND ".join(f"({c})" for _, c in dots)
     out["delta_reference_minus_wrong"] = {
-        "sql": ("SELECT o.rowid FROM orders o JOIN customers c ON ... WHERE <reference> "
-                "EXCEPT SELECT o.rowid ... WHERE <wrong>"),
-        "qwen_missing_lines": scalar(con, f"SELECT COUNT(*) FROM (SELECT o.rowid {FROM} WHERE {C09_REF_WHERE} "
-                                          f"EXCEPT SELECT o.rowid {FROM} WHERE {' AND '.join(f'({c})' for _, c in qwen)})"),
-        "dots_missing_lines": scalar(con, f"SELECT COUNT(*) FROM (SELECT o.rowid {FROM} WHERE {C09_REF_WHERE} "
-                                          f"EXCEPT SELECT o.rowid {FROM} WHERE {' AND '.join(f'({c})' for _, c in dots)})"),
+        "qwen_missing_lines": missed(qwen_where), "qwen_added_lines": added(qwen_where),
+        "dots_missing_lines": missed(dots_where), "dots_added_lines": added(dots_where),
+    }
+
+    # Delta query, by customer: the customer_id rows the reference counts and the wrong
+    # queries miss, with their revenue excluding VAT. Both wrong queries keep no line, so the
+    # delta is the whole reference population and its sum is the whole gap in cents.
+    delta_sql = (f"SELECT c.customer_id, c.birth_date, COUNT(*) AS order_lines, "
+                 f"SUM(o.quantity_product * p.price) AS revenue_cents {FROM} WHERE {C09_REF_WHERE} "
+                 f"GROUP BY c.customer_id, c.birth_date ORDER BY c.birth_date, c.customer_id")
+    rows = con.execute(delta_sql).fetchall()
+    total = sum(r[3] for r in rows)
+    wrong_value = {
+        name: scalar(con, f"SELECT COALESCE(SUM(o.quantity_product*p.price),0) {FROM} WHERE {w}")
+        for name, w in [("qwen3.8-27b", qwen_where), ("dots-3-note", dots_where)]
+    }
+    out["delta_by_customer"] = {
+        "sql": delta_sql,
+        "rows": [{"customer_id": r[0], "birth_date": r[1], "order_lines": r[2], "revenue_cents": r[3],
+                  "kept_by_qwen": bool(scalar(con, f"SELECT COUNT(*) {FROM} WHERE ({qwen_where}) AND c.customer_id = '{r[0]}'")),
+                  "kept_by_dots": bool(scalar(con, f"SELECT COUNT(*) {FROM} WHERE ({dots_where}) AND c.customer_id = '{r[0]}'"))}
+                 for r in rows],
+        "total_revenue_cents": total,
+        "wrong_values": wrong_value,
+        "difference_cents": {name: out["reference"]["revenue_cents"] - v for name, v in wrong_value.items()},
+        "explained_by_rows": all(out["reference"]["revenue_cents"] - v == total for v in wrong_value.values()),
     }
     print(json.dumps(out, indent=1))
 

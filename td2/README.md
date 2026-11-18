@@ -34,7 +34,9 @@ python td2/panels.py                             # the ten 2-of-3 panels on the 
 
 - Real case **C09** (F2, age at a date): `groq:qwen/qwen3.8-27b` and `openrouter:dots-studio/dots-3-note-preview:free` both return 0 cents for a reference of 487 980, through two different SQL errors that both empty the filter.
 - The fixed 2-of-3 panel and the 3-of-5 quorum **abstain** on C09; a panel {gpt-oss, qwen, dots} gives a **wrong consensus** on 0.
-- Independent check: a model-free population count. A 0 is rejected when the targeted population is not empty: it flags every wrong 0 of the batch and no true zero (C06, C14).
+- Delta query: the six customers the two faulty queries miss, with their revenue; the sum is the whole gap, 487 980 cents.
+- Independent check: a population count. A 0 is rejected when the targeted population is not empty. It is model-free for the age-at-a-date questions (it flags the wrong zeros of C02, C09, C11); for C10, C15 and C16 the population still comes from the reference query.
+- Cross-reviews of Steps 2 and 3: [peer-review-pair-A.md](peer-review-pair-A.md) (by Pair A), [peer-review-pair-C.md](peer-review-pair-C.md) (by Pair C).
 - Synthetic case DEMO-VOTE executed on its toy table, labelled synthetic.
 
 ```

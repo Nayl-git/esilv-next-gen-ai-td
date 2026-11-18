@@ -23,14 +23,29 @@ The [scan](pair-b-outputs/scan.json) of the twenty questions finds **one** case 
 
 ## 2. Cause in the SQL: two different errors, the same value
 
-The two models agree on the value but **not on the reasoning**. Each stored query is replayed and cut condition by condition ([cause.json](pair-b-outputs/cause.json)):
+The two models agree on the value but **not on the reasoning**. Each stored query is replayed and cut condition by condition ([cause.json](pair-b-outputs/cause.json)). The queries below are the complete queries as stored in the `sql` column of [traces-td1.csv](../traces-td1.csv); only the `-- Q1`, `-- D1`… labels were added. Both return 0 on `data/boutique.sqlite`.
 
-**qwen3.8-27b** computes the age **at the order date** (`o.date`), not on 2026-09-26, then adds two month-day bounds that contradict each other:
+**Reference query** ([reference-td1.csv](../reference-td1.csv), line C09), returns **487 980**:
 
 ```sql
-WHERE (strftime('%Y', o.date) - strftime('%Y', c.birth_date)) = 25                -- Q1
-  AND strftime('%m-%d', o.date) >= strftime('%m-%d', c.birth_date)                -- Q2
-  AND strftime('%m-%d', o.date) <  strftime('%m-%d', date(c.birth_date, '+26 years')) -- Q3
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM orders o
+JOIN product p ON p.product_id = o.product_id
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE (CAST(strftime('%Y', '2026-09-26') AS INTEGER) - CAST(strftime('%Y', c.birth_date) AS INTEGER)
+       - (strftime('%m-%d', '2026-09-26') < strftime('%m-%d', c.birth_date))) = 25
+```
+
+**qwen3.8-27b** (cell `groq:qwen/qwen3.8-27b:C09`, attempt 1) computes the age **at the order date** (`o.date`), not on 2026-09-26, then adds two month-day bounds that contradict each other:
+
+```sql
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN product p ON o.product_id = p.product_id
+WHERE (strftime('%Y', o.date) - strftime('%Y', c.birth_date)) = 25                          -- Q1
+  AND (strftime('%m-%d', o.date) >= strftime('%m-%d', c.birth_date))                        -- Q2
+  AND (strftime('%m-%d', o.date) < strftime('%m-%d', date(c.birth_date, '+26 years')));     -- Q3
 ```
 
 | Cumulative condition | Order lines | Customers | Reference lines kept |
@@ -41,12 +56,19 @@ WHERE (strftime('%Y', o.date) - strftime('%Y', c.birth_date)) = 25              
 
 Adding 26 years does not change a month-day, so Q3 reads `md < birth_md` while Q2 reads `md >= birth_md`: the conjunction is empty. Proof on the data: 0 customers have `md(birth + 26 years) ≠ md(birth)` (no 29 February), and Q2 ∧ Q3 keeps 0 lines.
 
-**dots-3-note** reads "exactly 25 on 2026-09-26" as "**turns** 25 on 2026-09-26", then adds a filter on the order date that the question does not contain:
+**dots-3-note** (cell `openrouter:dots-studio/dots-3-note-preview:free:C09`, attempt 1) reads "exactly 25 on 2026-09-26" as "**turns** 25 on 2026-09-26", then adds a filter on the order date that the question does not contain:
 
 ```sql
-WHERE CAST(SUBSTR(c.birth_date,1,4) AS INTEGER) + 25 = 2026                          -- D1
-  AND SUBSTR(c.birth_date,6,2) = '09' AND SUBSTR(c.birth_date,9,2) = '26'           -- D2
-  AND o.date >= '2026-09-26 00:00:00' AND o.date < '2026-09-27 00:00:00'            -- D3
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN product p ON o.product_id = p.product_id
+WHERE (
+    CAST(SUBSTR(c.birth_date, 1, 4) AS INTEGER) + 25 = 2026                 -- D1
+    AND SUBSTR(c.birth_date, 6, 2) = '09'                                   -- D2
+    AND SUBSTR(c.birth_date, 9, 2) = '26'                                   -- D2
+)
+AND o.date >= '2026-09-26 00:00:00' AND o.date < '2026-09-27 00:00:00';    -- D3
 ```
 
 | Cumulative condition | Order lines | Customers | Reference lines kept |
@@ -57,7 +79,37 @@ WHERE CAST(SUBSTR(c.birth_date,1,4) AS INTEGER) + 25 = 2026                     
 
 One customer is born on 2001-09-26, but the last order in the base is dated 2026-09-20 19:24:25: no order exists on 2026-09-26.
 
-**Delta query** (reference lines minus the lines of the wrong query, `... EXCEPT ...`): 68 lines missed by qwen, 68 by dots, i.e. the whole target population.
+### Delta query: the rows the faulty queries miss
+
+Both faulty queries keep **no** row (Q1 + Q2 + Q3 and D1 + D2 + D3 give 0 lines), so the rows that the reference counts and they miss are the whole reference population, and they add none. The delta query lists them by customer, with the condition of the reference query ([cause.json](pair-b-outputs/cause.json), key `delta_by_customer`; executed read-only on `data/boutique.sqlite`):
+
+```sql
+SELECT c.customer_id, c.birth_date, COUNT(*) AS order_lines,
+       SUM(o.quantity_product * p.price) AS revenue_cents
+FROM orders o
+JOIN product p   ON p.product_id  = o.product_id
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE (CAST(strftime('%Y', '2026-09-26') AS INTEGER) - CAST(strftime('%Y', c.birth_date) AS INTEGER)
+       - (strftime('%m-%d', '2026-09-26') < strftime('%m-%d', c.birth_date))) = 25
+GROUP BY c.customer_id, c.birth_date
+ORDER BY c.birth_date, c.customer_id;
+```
+
+| customer_id | birth_date | Order lines | Revenue excl. VAT (cents) | Missed by qwen3.8-27b | Missed by dots-3-note |
+|---|---|---|---|---|---|
+| C007 | 2000-11-30 | 18 | 118 740 | yes | yes |
+| C009 | 2001-03-10 | 9 | 61 330 | yes | yes |
+| C008 | 2001-05-15 | 11 | 99 090 | yes | yes |
+| C002 | 2001-09-24 | 6 | 25 920 | yes | yes |
+| C001 | 2001-09-25 | 18 | 135 000 | yes | yes |
+| C003 | 2001-09-26 | 6 | 47 900 | yes | yes |
+| **Total** | | **68** | **487 980** | | |
+
+**Exact difference:** reference 487 980 − wrong value 0 = **487 980 cents** for each of the two models, entirely explained by these six customers. No row is wrongly added. The line-level check gives the same result: reference lines `EXCEPT` wrong-query lines = 68 of 68 for each model.
+
+Where each faulty query loses these customers:
+- **qwen3.8-27b:** Q1 already drops C007 (born 2000-11-30: order year − birth year = 26 for every order of 2026) and keeps 50 of the 68 lines; Q2 + Q3 then remove every remaining line, since the two month-day bounds cannot both hold.
+- **dots-3-note:** D2 keeps only C003 (born 2001-09-26, 6 lines, 47 900 cents) and drops the five others; D3 then drops C003, because no order exists on 2026-09-26.
 
 **Why they agree.** Not because they share a reasoning, but because `COALESCE(SUM(...), 0)` turns **any empty filter into 0**, and 0 is a plausible answer (it is the right answer to C06 and C14). Two unrelated errors collapse onto the same value. This is an observation on one case; that 0 is the most frequent shared wrong value in general is a hypothesis, not a measurement.
 
@@ -90,23 +142,23 @@ The panels that answer most often (16/20) are exactly the ones that contain the 
 ## 4. Consequence for the panel and the check
 
 - **Panel.** On family F2, qwen3.8-27b and dots-3-note should not be the two members that can outvote the strongest one: in TD 1 they share a wrong 0 on C09. Distinct families are necessary but not sufficient: qwen and dots are different families and still agree on a wrong value.
-- **A different panel or escalation is a candidate, not a guarantee.** The fixed panel avoids C09 here only because north-mini-code failed to run; with a third model that also returned 0, it would have been fooled.
-- **Independent check: the population check.** Next to the SUM, the service computes, **without any model**, the number of order lines the question targets, with a second formulation of the age rule (a `date()` window, `birth_date > date(ref,'-26 years') AND birth_date <= date(ref,'-25 years')`, distinct from the `strftime` year difference of the reference). A returned 0 is **rejected** when that population is not empty. On C09: 68 lines → the 0 is flagged, whoever voted for it.
+- **A different panel or escalation is a candidate, not a guarantee.** The fixed panel avoids the wrong consensus on C09 by accident: north-mini-code failed to run (invalid SQL), so it cast no vote. Had it answered 0, the fixed panel would have decided a wrong consensus on 0 (2 votes of 3); had it answered 487 980, it would have decided the correct value. The abstention is not a property of the panel.
+- **Independent check: the population check.** Next to the SUM, the service counts the order lines the question targets and **rejects a returned 0 when that population is not empty**. For the age-at-a-date family (C02, C08, C09, C11) this count is computed **without any model and without the reference query**, with a second formulation of the age rule (a `date()` window, `birth_date > date(ref,'-26 years') AND birth_date <= date(ref,'-25 years')`, distinct from the `strftime` year difference of the reference). On C09: 68 lines → the 0 is flagged, whoever voted for it. For the other questions, the population used below is the `COUNT(*)` of the reference query: see the limit after the table.
 
 Result of the check on the twenty questions ([check.json](pair-b-outputs/check.json)):
 
-| Case | Reference | Target population (lines) | Models that returned 0 | Flagged |
-|---|---|---|---|---|
-| C02 | 590 320 | 82 | gpt-oss-20b | yes |
-| C06 | 0 | 0 | all five | no (true zero) |
-| **C09** | 487 980 | 68 (window: 68) | qwen3.8-27b, dots-3-note | **yes** |
-| C10 | 558 980 | 73 | north-mini-code | yes |
-| C11 | 446 690 | 60 | north-mini-code | yes |
-| C14 | 0 | 0 | all five | no (true zero) |
-| C15 | 168 680 | 27 | qwen3.8-27b | yes |
-| C16 | 376 740 | 55 | north-mini-code | yes |
+| Case | Reference | Target population (lines) | Population source | Models that returned 0 | Flagged |
+|---|---|---|---|---|---|
+| C02 | 590 320 | 82 | model-free `date()` window | gpt-oss-20b | yes |
+| C06 | 0 | 0 | reference query | all five | no (true zero) |
+| **C09** | 487 980 | 68 | model-free `date()` window | qwen3.8-27b, dots-3-note | **yes** |
+| C10 | 558 980 | 73 | reference query (circular) | north-mini-code | yes |
+| C11 | 446 690 | 60 | model-free `date()` window | north-mini-code | yes |
+| C14 | 0 | 0 | reference query | all five | no (true zero) |
+| C15 | 168 680 | 27 | reference query (circular) | qwen3.8-27b | yes |
+| C16 | 376 740 | 55 | reference query (circular) | north-mini-code | yes |
 
-Every wrong 0 of the batch is flagged (7 wrong zeros on 6 questions), and neither true zero is rejected. **Limit:** the check only catches the "empty filter" errors. It does not catch a non-zero wrong value (e.g. dots on C16 = 1 447 730, qwen on C16 = 367 050, off by one day). For those, the candidate checks are the reference query for the amount paid out, and human review, as in Pair C's routing rule.
+**What is shown, and what is not.** With a model-free population, the check flags the wrong zeros of **C02, C09 and C11** (4 of the 7 wrong zeros). For **C10, C15 and C16** (the 3 others) and for the two true zeros C06 and C14, the population is the `COUNT(*)` of the reference query: the flag is correct on our batch, but it uses the reference, which a live service does not have, so it is **circular** there and does not prove the check. Before it can run in production, a model-free population query must be written for age at the order (C10) and for the combinations (C15, C16). **Second limit:** the check only catches the "empty filter" errors. It does not catch a non-zero wrong value (e.g. dots on C16 = 1 447 730, qwen on C16 = 367 050, off by one day). For those, the candidate checks are the reference query for the amount paid out, and human review, as in Pair C's routing rule.
 
 ## 5. Supplied synthetic case: DEMO-VOTE
 
@@ -126,3 +178,5 @@ The 2-of-3 vote returns `consensus: true, value: 0, votes: 2`; the reference is 
 - One case in 20 questions × 5 models. This supports a hypothesis about this batch, not an error rate or a ranking.
 - The vote used for the panel comparison is a local copy of the TD 2 contract written in `wrong_consensus.py`. Cross-check with Pair A's `vote_k_sur_n` (commit f399f1a): `python atelier-vote.py --traces traces-td1.csv --case C09` returns `{"consensus": false, "value": null, "votes": 1, "models": []}`, the same fixed-panel decision (abstention, 1 vote).
 - The population check uses the `date()` window for F2 only; for the other families it falls back to the population of the reference query, which a live service would not have. Writing a model-free population query per family remains to be done before it can run in production.
+- "Last attempt" is the attempt with the highest `attempts` number for each (model, question) cell, not the last row read in file order, so the result does not depend on the order in which the trace files were merged. On `traces-td1.csv` both rules give the same row for all 100 cells.
+- The figures were revised after the cross-reviews by Pair A ([peer-review-pair-A.md](peer-review-pair-A.md)) and Pair C ([peer-review-pair-C.md](peer-review-pair-C.md)): complete SQL queries, delta query by customer, scope of the model-free check, and selection of the last attempt.
