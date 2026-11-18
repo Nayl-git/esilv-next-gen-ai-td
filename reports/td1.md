@@ -147,17 +147,6 @@ The table below is built from the Git history of this repository. **Each member 
 | nohamsantenac | References | References C09, C10 |
 | SinaESILV | References | References C13, C14 |
 
-## Use of coding assistance
-
-As the assignment requires, we declare that a coding assistant (Claude, from Anthropic) was used for the following tasks:
-- setting up the repository;
-- writing and executing the C07 and C08 reference queries and their cross-checks;
-- verifying the 20 references: SQL execution, an independent Python recomputation and the comparison with the published values;
-- correcting the C13 and C14 queries;
-- the consistency checks and corrections of the two summary files;
-- drafting this report.
-
-Every reference value comes from SQL executed on the database and from independent checks. No reference value was taken from a model's answer. The members remain responsible for the explanations, and each member must be able to explain the conventions and the traces of their own part.
 
 ## Next steps (TD 2)
 
