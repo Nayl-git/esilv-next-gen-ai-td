@@ -123,11 +123,13 @@ Read on commit 4cc60e5, offline.
 |---|---|---|
 | ambrere | A | `vote_k_sur_n` (commit f399f1a) |
 | *to complete* | A | |
-| enkimlt | B | Wrong-consensus analysis of C09: scan, quorums and panels, SQL cause and delta query, population check, DEMO-VOTE ([td2/](../td2/)); this report's Step 2; cross-review of Steps 1 and 3 |
-| nohamsantenac | B | *to complete* |
-| PierreBOUDRAA | B | *to complete* |
+| enkimlt | B | Step 2, shared equally with nohamsantenac and PierreBOUDRAA (see note below) |
+| nohamsantenac | B | Step 2, shared equally with enkimlt and PierreBOUDRAA (see note below) |
+| PierreBOUDRAA | B | Step 2, shared equally with enkimlt and nohamsantenac (see note below) |
 | Nayl-git | C | Adaptation of the routing simulator (commit def1d6e); `td1/` and `td2/` folders |
 | *to complete* | C | |
+
+**Pair B note.** The three members of Pair B worked together on one machine, so every Pair B commit is under the `enkimlt` account. The work was split roughly equally between the three. It covers the wrong-consensus analysis of C09 (scan, declared quorums and panels, SQL cause and delta query, population check, DEMO-VOTE; [td2/](../td2/)), the Step 2 section of this report, and the cross-review of Steps 1 and 3.
 
 ## Use of coding assistance
 
