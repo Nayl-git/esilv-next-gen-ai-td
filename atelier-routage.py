@@ -88,24 +88,37 @@ def evidence(r, family):
     return f"{r['model']} {family} {ok}/{n} ({','.join(TD1_CELLS[family])})"
 
 
+# Declared 2-of-3 panel (k = 2). On the TD 1 traces it gives 20 correct, 0 abstention, 0 wrong
+# consensus. The panel never holds qwen3.8-27b and dots-3-note together: both returned 0 on C09
+# (reference 487980), so a panel with both and gpt-oss-120b validates that wrong value.
+PANEL = "2-of-3 quorum on {gpt-oss-120b, gpt-oss-20b, qwen3.8-27b}"
+ZERO_CHECK = "population check before accepting a 0"
+
+
 def checks_for(request, r):
-    """Check required for a family and a use, given the TD 1 accuracy of the chosen model."""
+    """Check required for a family and a use, given the TD 1 accuracy of the chosen model.
+
+    A request that is not run has no check to describe.
+    """
+    if r is None:
+        return "not applicable (request not run)"
     family, use = request["family"], request["use"]
     perfect = False
-    if r is not None and family in TD1_CELLS:
+    if family in TD1_CELLS:
         ok, n = TD1_RATES[r["model"]][family]
         perfect = ok == n and n >= 4
+    age = family in ("F2", "F2b")
     if use == "payout":
-        return ("3-of-5 quorum, then human review" if family in ("F1", "F3")
-                else "reference check or human review")
+        if family in ("F1", "F3"):
+            return "3-of-5 quorum, then human review"
+        return "reference check or human review"
     if use == "customer":
-        return ("2-of-3 quorum anchored on gpt-oss-120b" if family in ("F2", "F2b")
-                else "2-of-3 quorum")
+        return PANEL + ("; " + ZERO_CHECK if age else "")
     if perfect and family in ("F1", "F3"):          # dashboard, 100 % on at least 4 cells
         return "none"
     if family == "F2":
         return "deterministic check (read-only execution and plausibility)"
-    return "2-of-3 quorum"
+    return PANEL + ("; " + ZERO_CHECK if age else "")
 
 
 def choose(request, resources):
