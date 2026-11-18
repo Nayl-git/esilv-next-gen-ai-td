@@ -305,7 +305,7 @@ All five TD 1 routes are free (the Groq free plan and the OpenRouter `:free` rou
 
 ## Cross-review by Pair B
 
-Two rounds, offline, by reading the code, the diffs and the produced tables against the assignment.
+Two rounds, offline, by reading the code, the diffs and the produced tables against the assignment. Files: [td2/peer-review-B-on-A.md](../td2/peer-review-B-on-A.md) and [td2/peer-review-B-on-C.md](../td2/peer-review-B-on-C.md).
 
 ### Second round (commit b1a5b35)
 
@@ -336,7 +336,7 @@ Two rounds, offline, by reading the code, the diffs and the produced tables agai
 
 ## Cross-review by Pair C
 
-Read on commit 024a46d, offline. The vote, the table and the key figures were recomputed with our own scripts; the full review, with the material, is in [td2/peer-review-pair-C.md](../td2/peer-review-pair-C.md). Both steps are sound: no wrong figure was found.
+Read on commit 024a46d, offline. The vote, the table and the key figures were recomputed with our own scripts; the full reviews, with the material, are in [td2/peer-review-C-on-A.md](../td2/peer-review-C-on-A.md) (Step 1) and [td2/peer-review-C-on-B.md](../td2/peer-review-C-on-B.md) (Step 2). Both steps are sound: no wrong figure was found.
 
 - **Step 1 (Pair A), consistent.** The five rules of `vote_k_sur_n` hold on our boundary tests (strict majority, duplicates including errors, errors kept in n, a vote on 0, all members failing). The table [td2-table.md](td2-table.md) has 0 difference with an independent vote on the twenty questions: 15 / 5 / 0 for the fixed panel, 16 / 4 / 0 for 3-of-5, and C19 is the only change.
   - **To do: comment C19.** The fixed panel sees three different values (1 990, 71 640, 83 580) and abstains; 3-of-5 sees 1 990 three times and decides. That consensus depends on a retry: gpt-oss-20b got HTTP 429 on its first attempt and answered correctly on the second. Without it, 1 990 would have 2 votes out of 3 required.
@@ -351,12 +351,12 @@ Read on commit 024a46d, offline. The vote, the table and the key figures were re
 
 ## Cross-review by Pair A
 
-Pair A reviewed Steps 2 and 3 by reading the documents, without re-running them; the full review is in [td2/peer-review-pair-A.md](../td2/peer-review-pair-A.md). It agrees with the figures of Pairs B and C (families, totals per model, panel tables) and raises the same main points as Pair C.
+Pair A reviewed Steps 2 and 3 by reading the documents, without re-running them; the full reviews are in [td2/peer-review-A-on-B.md](../td2/peer-review-A-on-B.md) (Step 2) and [td2/peer-review-A-on-C.md](../td2/peer-review-A-on-C.md) (Step 3). It agrees with the figures of Pairs B and C (families, totals per model, panel tables) and raises the same main points as Pair C.
 
 - **Step 2 (Pair B).** The delta query must list the customers with the exact cent difference; the two complete queries must be shown; the "every wrong 0 is flagged, model-free" claim must be restricted to C02, C08, C09 and C11; the selection of the last attempt should not depend on the file order.
   - **Pair B response, applied.** Same corrections as for Pair C above. In addition, `wrong_consensus.py` now selects the last attempt by the highest `attempts` number, not by file order; on `traces-td1.csv` it gives the same row for all 100 cells, so no figure changed.
 - **Step 3 (Pair C).** Panel P holds two gpt-oss models (the most fragile point); the "reference check" of the payout rows does not exist in production; payouts get a weaker check on F2 and F4 than on F1 and F3, although F2 is where the wrong consensus appeared; the reason for a check on F2 dashboards should be written; the zero check on F2b and F4 is required but not implementable yet; the Contributions section is incomplete.
-  - **Pair C response, applied.** The eight remarks, in the order of [td2/peer-review-pair-A.md](../td2/peer-review-pair-A.md):
+  - **Pair C response, applied.** The eight remarks, in the order of [td2/peer-review-A-on-C.md](../td2/peer-review-A-on-C.md):
     1. *Panel P.* Kept, and justified in "Coverage versus independence" with the figures of the distinct-family panel (15 correct, 5 abstentions, 0 wrong, against 20 / 0 / 0 for P), the in-sample choice and the possible correlation of the two gpt-oss models. The escalation Pair A asks for is added: when P abstains, the model does not answer, and the request goes to the recomputation and, for a payout, to a human review. The docstring of `vote_k_sur_n` (Lecture 2), not the assignment page, is the source of the distinct-family requirement: noted.
     2. *The "reference check" does not exist in production.* Replaced by a deterministic recomputation, a parameterised and model-free query, written for the five families in [td2/recompute.py](../td2/recompute.py) (see "Payout control").
     3. *Inconsistent payouts.* The control is now the same for every family: 3-of-5 quorum, recomputation, human review. F2, where the wrong consensus appeared, is not weaker than the others.

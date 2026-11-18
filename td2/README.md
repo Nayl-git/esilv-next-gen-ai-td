@@ -39,7 +39,7 @@ python td2/recompute.py --traces                 # the control applied to the 10
 - The fixed 2-of-3 panel and the 3-of-5 quorum **abstain** on C09; a panel {gpt-oss, qwen, dots} gives a **wrong consensus** on 0.
 - Delta query: the six customers the two faulty queries miss, with their revenue; the sum is the whole gap, 487 980 cents.
 - Independent check: a population count. A 0 is rejected when the targeted population is not empty. It is model-free for the age-at-a-date questions (it flags the wrong zeros of C02, C09, C11); for C10, C15 and C16 the population still comes from the reference query.
-- Cross-reviews of Steps 2 and 3: [peer-review-pair-A.md](peer-review-pair-A.md) (by Pair A), [peer-review-pair-C.md](peer-review-pair-C.md) (by Pair C).
+- Cross-reviews, one file per pair reviewed: [A on B](peer-review-A-on-B.md), [A on C](peer-review-A-on-C.md), [B on A](peer-review-B-on-A.md), [B on C](peer-review-B-on-C.md), [C on A](peer-review-C-on-A.md), [C on B](peer-review-C-on-B.md).
 - Synthetic case DEMO-VOTE executed on its toy table, labelled synthetic.
 
 ```
