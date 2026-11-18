@@ -117,7 +117,8 @@ def checks_for(request, r):
     if perfect and family in ("F1", "F3"):          # dashboard, 100 % on at least 4 cells
         return "none"
     if family == "F2":
-        return "deterministic check (read-only execution and plausibility)"
+        # read-only execution does not catch a wrong 0 (C09), so the zero check is part of it
+        return "read-only execution and " + ZERO_CHECK
     return PANEL + ("; " + ZERO_CHECK if age else "")
 
 
