@@ -132,4 +132,4 @@ All five TD 1 routes are free (the Groq free plan and the OpenRouter `:free` rou
 
 ### Contributions
 
-To fill in by Pair C: who computed the rates, who adapted `RESOURCES` and `choose`, who wrote the analysis. Coding assistance (Claude) was used to compute the rates from the traces, to adapt `atelier-routage.py` and to draft this section; the members of Pair C must be able to explain the rule, the simulator branches and the figures above.
+Pair C is a trio: Franck TANKHAPANYA, Sina BALAEI and Nayl SAIFOUDINE. To fill in: who computed the rates, who adapted `RESOURCES` and `choose`, who wrote the analysis. A coding assistant was used to compute the rates from the traces, to adapt `atelier-routage.py` and to draft this section; the members of Pair C must be able to explain the rule, the simulator branches and the figures above.

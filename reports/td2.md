@@ -269,8 +269,11 @@ Two rounds, offline, by reading the code, the diffs and the produced tables agai
 | enkimlt | B | Step 2, shared equally with nohamsantenac and PierreBOUDRAA (see note below) |
 | nohamsantenac | B | Step 2, shared equally with enkimlt and PierreBOUDRAA (see note below) |
 | PierreBOUDRAA | B | Step 2, shared equally with enkimlt and nohamsantenac (see note below) |
-| Nayl-git | C | Adaptation of the routing simulator (commits def1d6e, e6d376b); rule, panel evaluation and Step 3 section revised after the cross-review; `td1/` and `td2/` folders |
-| *to complete* | C | |
+| Nayl-git (Nayl SAIFOUDINE) | C | Adaptation of the routing simulator (commits def1d6e, e6d376b); rule, panel evaluation and Step 3 section revised after the cross-review; `td1/` and `td2/` folders |
+| francktank (Franck TANKHAPANYA) | C | *to complete* |
+| SinaESILV (Sina BALAEI) | C | *to complete* |
+
+**Pair C note.** Pair C is a trio: Franck TANKHAPANYA, Sina BALAEI and Nayl SAIFOUDINE. The commits of the Step 3 files are under the `Nayl-git` account. The contribution of each member is to be completed by the trio.
 
 **Pair B note.** The three members of Pair B worked together on one machine, so every Pair B commit is under the `enkimlt` account. The work was split roughly equally between the three. It covers the wrong-consensus analysis of C09 (scan, declared quorums and panels, SQL cause and delta query, population check, DEMO-VOTE; [td2/](../td2/)), the Step 2 section of this report, and the cross-review of Steps 1 and 3.
 
