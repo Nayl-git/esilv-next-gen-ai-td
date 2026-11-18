@@ -110,8 +110,8 @@ def checks_for(request, r):
     age = family in ("F2", "F2b")
     if use == "payout":
         # Same control for every family. The lab reference does not exist in production, so the
-        # control is a model-free recomputation (a parameterised query per family; implemented
-        # for F2 only, see td2/wrong_consensus.py) followed by a human review.
+        # control is a model-free recomputation (a parameterised query, implemented for the five
+        # families in td2/recompute.py) followed by a human review.
         return "3-of-5 quorum, then deterministic recomputation, then human review"
     if use == "customer":
         return PANEL + ("; " + ZERO_CHECK if age else "")

@@ -26,9 +26,12 @@ python atelier-routage.py                        # the nine scenarios
 python atelier-routage.py --scenario deferrable  # one scenario
 python td2/rates_by_family.py                    # TD 1 rates by question family (--failures for the failing cells)
 python td2/panels.py                             # the ten 2-of-3 panels on the TD 1 traces
+python td2/recompute.py                          # deterministic recomputation of the twenty questions
+python td2/recompute.py --verify C09 0           # accept or reject a model figure
+python td2/recompute.py --traces                 # the control applied to the 100 TD 1 cells
 ```
 
-`rates_by_family.py` and `panels.py` read `traces-td1.csv` and `reference-td1.csv`, offline, standard library only. The reference is read only after each decision.
+`rates_by_family.py`, `panels.py` and `recompute.py` read the TD 1 traces, the references and the database (read-only), offline, standard library only. The reference is read only after each decision. `recompute.py` is the payout control: a parameterised, model-free query for the five families, checked against the references and a plain-Python path on the CSV files.
 
 ## Pair B: wrong consensus
 

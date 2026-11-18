@@ -89,4 +89,4 @@ Verdict: both steps are sound. We found no wrong figure. The remarks concern evi
 
 ## Effect on Step 3 (our own section)
 
-The second remark changes a claim of Pair C. Our rule requires the zero check for F2 and F2b figures. It is model-free today only for F2 (C02, C08, C09, C11). For F2b (C10), the population still comes from the reference query. The zero check on F2b is therefore a requirement, not yet an implemented control. We added this limit to our section.
+The second remark changes a claim of Pair C. Our rule requires the zero check for F2 and F2b figures. It is model-free today only for F2 (C02, C08, C09, C11). For F2b (C10), the population still comes from the reference query. The zero check on F2b was therefore a requirement, not an implemented control. We added this limit to our section, then wrote `td2/recompute.py`, a parameterised recomputation for the five families that does not need the reference and rejects every wrong 0 of TD 1. It also gives Pair B a model-free formulation for C10, C15 and C16.
